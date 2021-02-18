@@ -11,7 +11,7 @@ repositories {
 
 jar {
     manifest {
-        attributes 'Premain-Class': 'tech.httptoolkit.server.javaagent.HttpToolkitAgent'
+        attributes 'Premain-Class': 'tech.httptoolkit.javaagent.HttpProxyAgent'
     }
 }
 
