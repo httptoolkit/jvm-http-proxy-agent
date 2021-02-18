@@ -1,0 +1,20 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+}
+
+group 'tech.httptoolkit'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes 'Premain-Class': 'tech.httptoolkit.server.javaagent.HttpToolkitAgent'
+    }
+}
+
+dependencies {
+    implementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.10.20'
+}
