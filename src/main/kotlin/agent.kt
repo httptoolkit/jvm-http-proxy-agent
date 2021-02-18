@@ -25,7 +25,7 @@ fun premain(arguments: String?, instrumentation: Instrumentation) {
     val (certPath, proxyHost, proxyPort) = getConfig()
 
     forceProxy(proxyHost, proxyPort)
-    trustEveryone(certPath)
+    trustMe(certPath)
 
     println("HTTP Toolkit interception active")
 }
@@ -34,7 +34,7 @@ data class Config(
     val certPath: String,
     val proxyHost: String,
     val proxyPort: Int
-);
+)
 
 private fun getConfig(): Config {
     val proxyUrl: String? = System.getenv("HTTPS_PROXY")
@@ -64,7 +64,7 @@ class HtkProxySelector(private val proxyAddress: SocketAddress) : ProxySelector(
 
     override fun select(uri: URI): MutableList<Proxy> {
         return if (uri.scheme == "http" || uri.scheme == "https") {
-            mutableListOf(Proxy(Proxy.Type.HTTP, proxyAddress));
+            mutableListOf(Proxy(Proxy.Type.HTTP, proxyAddress))
         } else {
             mutableListOf(Proxy.NO_PROXY)
         }
@@ -77,11 +77,16 @@ class HtkProxySelector(private val proxyAddress: SocketAddress) : ProxySelector(
 }
 
 private fun forceProxy(proxyHost: String, proxyPort: Int) {
-    val proxyAddress = InetSocketAddress(proxyHost, proxyPort);
+    System.setProperty("http.proxyHost", proxyHost)
+    System.setProperty("http.proxyPort", proxyPort.toString())
+    System.setProperty("https.proxyHost", proxyHost)
+    System.setProperty("https.proxyPort", proxyPort.toString())
+
+    val proxyAddress = InetSocketAddress(proxyHost, proxyPort)
     ProxySelector.setDefault(HtkProxySelector(proxyAddress))
 }
 
-private fun trustEveryone(certPath: String) {
+private fun trustMe(certPath: String) {
     val crtFile = File(certPath)
     val certificate: Certificate = CertificateFactory.getInstance("X.509").generateCertificate(FileInputStream(crtFile))
 
