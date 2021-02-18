@@ -14,9 +14,10 @@ This agent can capture traffic from:
 - [x] Java 11's built-in HttpClient
 - [ ] Apache HttpClient v4
 - [ ] Apache HttpClient v5
-- [ ] OkHttp v2
-- [ ] OkHttp v3
-- [ ] Retrofit
+- [x] OkHttp v2
+- [x] OkHttp v3
+- [x] OkHttp v4
+- [x] Retrofit
 
 In general, this will also capture HTTP(S) from any downstream libraries based on each of these clients, and so covers a very large area of HTTP usage.
 
