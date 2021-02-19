@@ -1,4 +1,5 @@
 plugins {
+    id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.4.10'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
@@ -15,6 +16,9 @@ jar {
         attributes 'Premain-Class': 'tech.httptoolkit.javaagent.HttpProxyAgent'
         attributes 'Agent-Class': 'tech.httptoolkit.javaagent.HttpProxyAgent'
         attributes 'Main-Class': 'tech.httptoolkit.javaagent.HttpProxyAgent'
+
+        attributes 'Can-Redefine-Classes': 'true'
+        attributes 'Can-Retransform-Classes': 'true'
     }
 }
 

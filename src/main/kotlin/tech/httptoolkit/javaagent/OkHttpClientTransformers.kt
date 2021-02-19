@@ -1,15 +1,11 @@
 package tech.httptoolkit.javaagent
 
 import net.bytebuddy.agent.builder.AgentBuilder
+import net.bytebuddy.asm.Advice
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
-import net.bytebuddy.implementation.FixedValue
-import net.bytebuddy.matcher.ElementMatchers
-import net.bytebuddy.matcher.ElementMatchers.named
 import net.bytebuddy.utility.JavaModule
-import java.net.InetSocketAddress
-import java.net.Proxy
-import javax.net.ssl.SSLContext
+import net.bytebuddy.matcher.ElementMatchers.*
 
 /**
  * Transforms the OkHttpClient for v3 & 4 to use our proxy & trust our certificate.
@@ -21,11 +17,7 @@ import javax.net.ssl.SSLContext
  * Without this, proxy settings work by default, but certificates do not - OkHttp
  * only trusts the default built-in certificates, and refuses ours.
  */
-class OkHttpClientV3Transformer(
-    private val proxyHost: String,
-    private val proxyPort: Int,
-    private val sslContext: SSLContext
-) : MatchingAgentTransformer {
+class OkHttpClientV3Transformer : MatchingAgentTransformer {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -39,15 +31,14 @@ class OkHttpClientV3Transformer(
         classLoader: ClassLoader?,
         module: JavaModule?
     ): DynamicType.Builder<*>? {
-        val proxyAddress = InetSocketAddress(proxyHost, proxyPort)
-        val proxy = Proxy(Proxy.Type.HTTP, proxyAddress)
-
         return builder
             // v3 uses proxy() functions, while v4 uses Kotlin getters that compile to the same thing
-            .method(named("proxy")).intercept(FixedValue.value(proxy))
+            .visit(Advice.to(ReturnProxyAdvice::class.java)
+                .on(hasMethodName("proxy")))
             // This means we ignore client certs, but that's fine: we can't pass them through the proxy anyway. That
             // needs to be configured separately in the proxy's configuration.
-            .method(named("sslSocketFactory")).intercept(FixedValue.value(sslContext.socketFactory))
+            .visit(Advice.to(ReturnSslSocketFactoryAdvice::class.java)
+                .on(hasMethodName("sslSocketFactory")))
     }
 }
 
@@ -61,11 +52,7 @@ class OkHttpClientV3Transformer(
  * Without this, proxy settings work by default, but certificates do not - OkHttp
  * only trusts the default built-in certificates, and refuses ours.
  */
-class OkHttpClientV2Transformer(
-    private val proxyHost: String,
-    private val proxyPort: Int,
-    private val sslContext: SSLContext
-) : MatchingAgentTransformer {
+class OkHttpClientV2Transformer : MatchingAgentTransformer {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -79,12 +66,11 @@ class OkHttpClientV2Transformer(
         classLoader: ClassLoader?,
         module: JavaModule?
     ): DynamicType.Builder<*>? {
-        val proxyAddress = InetSocketAddress(proxyHost, proxyPort)
-        val proxy = Proxy(Proxy.Type.HTTP, proxyAddress)
-
         return builder
             // v2 uses getX methods:
-            .method(named("getProxy")).intercept(FixedValue.value(proxy))
-            .method(named("getSslSocketFactory")).intercept(FixedValue.value(sslContext.socketFactory))
+            .visit(Advice.to(ReturnProxyAdvice::class.java)
+                .on(hasMethodName("getProxy")))
+            .visit(Advice.to(ReturnSslSocketFactoryAdvice::class.java)
+                .on(hasMethodName("getSslSocketFactory")))
     }
 }

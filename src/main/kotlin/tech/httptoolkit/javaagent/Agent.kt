@@ -6,14 +6,27 @@ import com.sun.tools.attach.VirtualMachine
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.dynamic.scaffold.TypeValidation
+import net.bytebuddy.matcher.ElementMatchers.none
 import java.lang.instrument.Instrumentation
 import javax.net.ssl.SSLContext
 import java.net.*
 import kotlin.system.exitProcess
 import java.lang.management.ManagementFactory
 import java.io.File
+import javax.net.ssl.HttpsURLConnection
+import java.nio.file.Files
 
-lateinit var interceptedSslContext: SSLContext
+
+lateinit var InterceptedSslContext: SSLContext
+    private set
+
+lateinit var AgentProxyHost: String
+    private set
+
+var AgentProxyPort = -1
+    private set
+
+lateinit var AgentProxySelector: ProxySelector
     private set
 
 // If attached at startup with a -javaagent argument, use either arguments or env
@@ -60,7 +73,6 @@ fun main(args: Array<String>) {
         ConstantProxySelector::class.java // Any arbitrary class defined inside this JAR
             .protectionDomain.codeSource.location.path
     ).absolutePath
-    println("This jar: $jarPath")
 
     // Inject the agent with our config arguments into the target VM
     val vm: VirtualMachine = VirtualMachine.attach(pid)
@@ -71,25 +83,34 @@ fun main(args: Array<String>) {
 fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
     val (certPath, proxyHost, proxyPort) = config
 
-    // Configure the default proxy settings
-    setDefaultProxy(proxyHost, proxyPort)
+    InterceptedSslContext = buildSslContextForCertificate(certPath)
+    AgentProxyHost = proxyHost
+    AgentProxyPort = proxyPort
 
-    // Configure the default certificate trust settings
-    interceptedSslContext = buildSslContextForCertificate(certPath)
-    SSLContext.setDefault(interceptedSslContext)
+    // Reconfigure the JVM default settings:
+    setDefaultProxy(proxyHost, proxyPort)
+    setDefaultSslContext(InterceptedSslContext)
+
+    val bootstrapCache = Files.createTempDirectory("proxy-agent-bootstrap-cache").toFile()
 
     // Disabling type validation allows us to intercept non-Java types, e.g. Kotlin
     // in OkHttp. See https://github.com/raphw/byte-buddy/issues/764
-    var agentBuilder = AgentBuilder.Default(ByteBuddy().with(TypeValidation.DISABLED))
+    var agentBuilder = AgentBuilder.Default(
+            ByteBuddy().with(TypeValidation.DISABLED)
+        )
+        .ignore(none())
         .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
+        .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
+        .disableClassFormatChanges()
         .with(AgentBuilder.Listener.StreamWriting.toSystemOut().withTransformationsOnly())
 
     arrayOf(
-        OkHttpClientV3Transformer(proxyHost, proxyPort, interceptedSslContext),
-        OkHttpClientV2Transformer(proxyHost, proxyPort, interceptedSslContext),
-        ApacheClientRoutingV4Transformer(proxyHost, proxyPort),
-        ApacheClientRoutingV5Transformer(proxyHost, proxyPort),
+        OkHttpClientV3Transformer(),
+        OkHttpClientV2Transformer(),
+        ApacheClientRoutingV4Transformer(),
+        ApacheClientRoutingV5Transformer(),
         ApacheSslSocketFactoryTransformer(),
+        JavaClientTransformer(),
     ).forEach { matchingAgentTransformer ->
         agentBuilder = matchingAgentTransformer.register(agentBuilder)
     }
@@ -110,5 +131,11 @@ private fun setDefaultProxy(proxyHost: String, proxyPort: Int) {
     System.setProperty("https.proxyPort", proxyPort.toString())
 
     val proxySelector = ConstantProxySelector(proxyHost, proxyPort)
+    AgentProxySelector = proxySelector
     ProxySelector.setDefault(proxySelector)
+}
+
+private fun setDefaultSslContext(context: SSLContext) {
+    SSLContext.setDefault(context)
+    HttpsURLConnection.setDefaultSSLSocketFactory(context.socketFactory)
 }
