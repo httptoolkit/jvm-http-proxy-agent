@@ -12,8 +12,8 @@ This agent can capture traffic from:
 
 - [x] Java's built-in HttpURLConnection
 - [x] Java 11's built-in HttpClient
-- [ ] Apache HttpClient v4
-- [ ] Apache HttpClient v5
+- [x] Apache HttpClient v4
+- [x] Apache HttpClient v5
 - [x] OkHttp v2
 - [x] OkHttp v3
 - [x] OkHttp v4

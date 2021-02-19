@@ -5,6 +5,7 @@ import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.implementation.FixedValue
 import net.bytebuddy.matcher.ElementMatchers
+import net.bytebuddy.matcher.ElementMatchers.named
 import net.bytebuddy.utility.JavaModule
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -20,11 +21,18 @@ import javax.net.ssl.SSLContext
  * Without this, proxy settings work by default, but certificates do not - OkHttp
  * only trusts the default built-in certificates, and refuses ours.
  */
-class OkHttpClientTransformer(
+class OkHttpClientV3Transformer(
     private val proxyHost: String,
     private val proxyPort: Int,
     private val sslContext: SSLContext
-) : AgentBuilder.Transformer {
+) : MatchingAgentTransformer {
+    override fun register(builder: AgentBuilder): AgentBuilder {
+        return builder
+            .type(
+                named("okhttp3.OkHttpClient")
+            ).transform(this)
+    }
+
     override fun transform(
         builder: DynamicType.Builder<*>,
         typeDescription: TypeDescription,
@@ -36,8 +44,10 @@ class OkHttpClientTransformer(
 
         return builder
             // v3 uses proxy() functions, while v4 uses Kotlin getters that compile to the same thing
-            .method(ElementMatchers.named("proxy")).intercept(FixedValue.value(proxy))
-            .method(ElementMatchers.named("sslSocketFactory")).intercept(FixedValue.value(sslContext.socketFactory))
+            .method(named("proxy")).intercept(FixedValue.value(proxy))
+            // This means we ignore client certs, but that's fine: we can't pass them through the proxy anyway. That
+            // needs to be configured separately in the proxy's configuration.
+            .method(named("sslSocketFactory")).intercept(FixedValue.value(sslContext.socketFactory))
     }
 }
 
@@ -55,7 +65,14 @@ class OkHttpClientV2Transformer(
     private val proxyHost: String,
     private val proxyPort: Int,
     private val sslContext: SSLContext
-) : AgentBuilder.Transformer {
+) : MatchingAgentTransformer {
+    override fun register(builder: AgentBuilder): AgentBuilder {
+        return builder
+            .type(
+                named("com.squareup.okhttp.OkHttpClient")
+            ).transform(this)
+    }
+
     override fun transform(
         builder: DynamicType.Builder<*>,
         typeDescription: TypeDescription,
@@ -67,7 +84,7 @@ class OkHttpClientV2Transformer(
 
         return builder
             // v2 uses getX methods:
-            .method(ElementMatchers.named("getProxy")).intercept(FixedValue.value(proxy))
-            .method(ElementMatchers.named("getSslSocketFactory")).intercept(FixedValue.value(sslContext.socketFactory))
+            .method(named("getProxy")).intercept(FixedValue.value(proxy))
+            .method(named("getSslSocketFactory")).intercept(FixedValue.value(sslContext.socketFactory))
     }
 }

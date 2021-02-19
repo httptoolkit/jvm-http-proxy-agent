@@ -16,7 +16,15 @@ import java.lang.IllegalStateException
 class ApacheClientRoutingV4Transformer(
     private val proxyHost: String,
     private val proxyPort: Int
-) : AgentBuilder.Transformer {
+) : MatchingAgentTransformer {
+    override fun register(builder: AgentBuilder): AgentBuilder {
+        return builder.type(
+            hasSuperType(named("org.apache.http.conn.routing.HttpRoutePlanner"))
+        ).and(
+            not(isInterface())
+        ).transform(this)
+    }
+
     override fun transform(
         builder: DynamicType.Builder<*>,
         typeDescription: TypeDescription,
@@ -63,7 +71,14 @@ class HttpRouteV4Interceptor(
 class ApacheClientRoutingV5Transformer(
     private val proxyHost: String,
     private val proxyPort: Int
-) : AgentBuilder.Transformer {
+) : MatchingAgentTransformer {
+    override fun register(builder: AgentBuilder): AgentBuilder {
+        return builder.type(
+            hasSuperType(named("org.apache.hc.client5.http.routing.HttpRoutePlanner"))
+        ).and(
+            not(isInterface())
+        ).transform(this)
+    }
 
     override fun transform(
         builder: DynamicType.Builder<*>,
@@ -102,7 +117,17 @@ class HttpRouteV5Interceptor(
 // call super otherwise) to replace the configured SslSocketFactory with one of our own that uses our configured
 // SSLContext, which trusts our certificate, straight after initialization.
 
-class ApacheSslSocketFactoryTransformer : AgentBuilder.Transformer {
+class ApacheSslSocketFactoryTransformer : MatchingAgentTransformer {
+    override fun register(builder: AgentBuilder): AgentBuilder {
+        return builder
+            .type(
+                named("org.apache.http.conn.ssl.SSLConnectionSocketFactory")
+            ).transform(this)
+            .type(
+                named("org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory")
+            ).transform(this)
+    }
+
     override fun transform(
         builder: DynamicType.Builder<*>,
         typeDescription: TypeDescription,
@@ -144,9 +169,8 @@ object SslSocketFactoryInterceptor {
             // Allow ourselves to change the socket value
             socketFactoryField.isAccessible = true
 
-            // Overwrite the socket factory with our own.
-            // SSLContext.getDefault() is already overridden by the agent to be our own SSL context
-            socketFactoryField.set(thisFactory, SSLContext.getDefault().socketFactory)
+            // Overwrite the socket factory with our own:
+            socketFactoryField.set(thisFactory, interceptedSslContext.socketFactory)
         }
     }
 }
