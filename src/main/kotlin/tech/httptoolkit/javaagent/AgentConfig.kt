@@ -1,6 +1,7 @@
 package tech.httptoolkit.javaagent
 
 import java.lang.IllegalArgumentException
+import java.lang.Integer.parseInt
 import java.net.URI
 import java.net.URISyntaxException
 
@@ -10,7 +11,7 @@ data class Config(
     val proxyPort: Int
 )
 
-fun getConfig(): Config {
+fun getConfigFromEnv(): Config {
     val proxyUrl: String? = System.getenv("HTTPS_PROXY")
     if (proxyUrl.isNullOrEmpty()) {
         throw IllegalArgumentException("HTTPS interception failed, proxy URL not provided.")
@@ -32,4 +33,14 @@ fun getConfig(): Config {
     val proxyPort = parsedProxyUrl.port
 
     return Config(certPath, proxyHost, proxyPort)
+}
+
+fun formatConfigArg(proxyHost: String, proxyPort: String, certPath: String): String {
+    return "$proxyHost|$proxyPort|$certPath"
+}
+
+fun getConfigFromArg(arg: String): Config {
+    val (proxyHost, proxyPort, certPath) = arg.split("|", limit = 3)
+    // ^ Limited so that you can use | in filenames, if you *really* want to be difficult
+    return Config(certPath, proxyHost, parseInt(proxyPort))
 }
