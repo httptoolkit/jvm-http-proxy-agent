@@ -18,4 +18,8 @@ jar {
 
 dependencies {
     implementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.10.20'
+
+    // Dependencies we load only as part of rewriting them, iff the target app includes them:
+    compileOnly group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
+    compileOnly group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.0.3'
 }

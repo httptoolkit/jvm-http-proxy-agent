@@ -4,13 +4,8 @@ package tech.httptoolkit.javaagent
 
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.builder.AgentBuilder
-import net.bytebuddy.description.type.TypeDescription
-import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.dynamic.scaffold.TypeValidation
-import net.bytebuddy.implementation.FixedValue
-import net.bytebuddy.matcher.ElementMatcher
-import net.bytebuddy.matcher.ElementMatchers.named
-import net.bytebuddy.utility.JavaModule
+import net.bytebuddy.matcher.ElementMatchers.*
 import java.lang.instrument.Instrumentation
 import javax.net.ssl.SSLContext
 import java.net.*
@@ -33,11 +28,29 @@ fun premain(arguments: String?, instrumentation: Instrumentation) {
         .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
 
     mapOf(
-        "okhttp3.OkHttpClient" to OkHttpClientTransformer(proxyHost, proxyPort, sslContext),
-        "com.squareup.okhttp.OkHttpClient" to OkHttpClientV2Transformer(proxyHost, proxyPort, sslContext)
+        "okhttp3.OkHttpClient" to
+                OkHttpClientTransformer(proxyHost, proxyPort, sslContext),
+        "com.squareup.okhttp.OkHttpClient" to
+                OkHttpClientV2Transformer(proxyHost, proxyPort, sslContext),
+        "org.apache.http.conn.ssl.SSLConnectionSocketFactory" to
+                ApacheSslSocketFactoryTransformer(),
+        "org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory" to
+                ApacheSslSocketFactoryTransformer()
     ).forEach { (className, transformer) ->
         agentBuilder = agentBuilder.type(named(className)).transform(transformer)
     }
+
+    agentBuilder = agentBuilder.type(
+        hasSuperType(named("org.apache.http.conn.routing.HttpRoutePlanner"))
+    ).and(not(isInterface())).transform(
+        ApacheClientRoutingV4Transformer(proxyHost, proxyPort)
+    )
+
+    agentBuilder = agentBuilder.type(
+        hasSuperType(named("org.apache.hc.client5.http.routing.HttpRoutePlanner"))
+    ).and(not(isInterface())).transform(
+        ApacheClientRoutingV5Transformer(proxyHost, proxyPort)
+    )
 
     agentBuilder.installOn(instrumentation)
 
