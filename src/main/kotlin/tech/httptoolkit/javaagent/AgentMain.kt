@@ -2,7 +2,6 @@
 
 package tech.httptoolkit.javaagent
 
-import com.sun.tools.attach.VirtualMachine
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.dynamic.scaffold.TypeValidation
@@ -10,11 +9,7 @@ import net.bytebuddy.matcher.ElementMatchers.none
 import java.lang.instrument.Instrumentation
 import javax.net.ssl.SSLContext
 import java.net.*
-import kotlin.system.exitProcess
-import java.lang.management.ManagementFactory
-import java.io.File
 import javax.net.ssl.HttpsURLConnection
-import java.nio.file.Files
 
 
 lateinit var InterceptedSslContext: SSLContext
@@ -50,36 +45,6 @@ fun agentmain(arguments: String?, instrumentation: Instrumentation) {
     interceptAllHttps(config, instrumentation)
 }
 
-// If run directly, can either list potential targets (list-targets) or attach to a target (pid, ...config)
-fun main(args: Array<String>) {
-    if (args.size == 1 && args[0] == "list-targets") {
-        // This isn't guaranteed to work everywhere, but it should work in most places:
-        val (pid) = ManagementFactory.getRuntimeMXBean().name.split("@")
-
-        VirtualMachine.list().forEach { vmd ->
-            if (vmd.id() != pid) {
-                println("${vmd.id()}:${vmd.displayName()}")
-            }
-        }
-        exitProcess(0)
-    } else if (args.size != 4) {
-        System.err.println("Usage: java -jar <agent.jar> <target-PID> <proxyHost> <proxyPort> <path-to-certificate>")
-        exitProcess(1)
-    }
-
-    val (pid, proxyHost, proxyPort, certPath) = args
-
-    val jarPath = File(
-        ConstantProxySelector::class.java // Any arbitrary class defined inside this JAR
-            .protectionDomain.codeSource.location.path
-    ).absolutePath
-
-    // Inject the agent with our config arguments into the target VM
-    val vm: VirtualMachine = VirtualMachine.attach(pid)
-    vm.loadAgent(jarPath, formatConfigArg(proxyHost, proxyPort, certPath))
-    vm.detach()
-}
-
 fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
     val (certPath, proxyHost, proxyPort) = config
 
@@ -90,8 +55,6 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
     // Reconfigure the JVM default settings:
     setDefaultProxy(proxyHost, proxyPort)
     setDefaultSslContext(InterceptedSslContext)
-
-    val bootstrapCache = Files.createTempDirectory("proxy-agent-bootstrap-cache").toFile()
 
     // Disabling type validation allows us to intercept non-Java types, e.g. Kotlin
     // in OkHttp. See https://github.com/raphw/byte-buddy/issues/764
