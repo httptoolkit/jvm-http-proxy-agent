@@ -25,3 +25,14 @@ dependencies {
     compileOnly group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
     compileOnly group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.0.3'
 }
+
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
