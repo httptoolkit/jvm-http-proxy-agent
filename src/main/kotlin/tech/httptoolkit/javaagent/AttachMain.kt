@@ -48,7 +48,19 @@ fun main(args: Array<String>) {
     ).absolutePath
 
     // Inject the agent with our config arguments into the target VM
-    val vm: VirtualMachine = VirtualMachine.attach(pid)
-    vm.loadAgent(jarPath, formatConfigArg(proxyHost, proxyPort, certPath))
-    vm.detach()
+    try {
+        val vm: VirtualMachine = VirtualMachine.attach(pid)
+        vm.loadAgent(jarPath, formatConfigArg(proxyHost, proxyPort, certPath))
+        vm.detach()
+    } catch (e: AgentLoadException) {
+        if (e.message == "0") {
+            // This is a cross-JVM-version bug, and this is actually a success result.
+            // See https://stackoverflow.com/questions/54340438/
+            return
+        } else {
+            System.err.println("Attaching agent failed")
+            e.printStackTrace()
+            exitProcess(3)
+        }
+    }
 }
