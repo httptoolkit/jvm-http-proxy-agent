@@ -10,10 +10,13 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 
-val resourcesPath: Path = Paths.get("src", "test", "resources")
+val resourcesPath = Paths.get("src", "test", "resources")!!
 
 const val proxyHost = "127.0.0.1"
 val certPath = resourcesPath.resolve("cert.pem").toAbsolutePath().toString()
+
+// We always launch subprocesses with the same Java that we're using ourselves
+val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toString()!!
 
 val wireMockServer = WireMockServer(options()
     .dynamicPort()
@@ -30,7 +33,7 @@ class IntegrationTests : StringSpec({
         val agentArgs = "$proxyHost|${wireMockServer.port()}|$certPath"
 
         val proc = ProcessBuilder(
-            "/usr/bin/java",
+            javaPath,
             "-javaagent:./build/libs/http-proxy-agent-1.0-SNAPSHOT-all.jar=$agentArgs",
             "-jar", "./test-app/build/libs/test-app-1.0-SNAPSHOT-all.jar"
         ).inheritIO().start()
@@ -45,7 +48,7 @@ class IntegrationTests : StringSpec({
     "Launching directly and attaching later should eventually intercept all clients" {
         // Start up the target:
         val targetProc = ProcessBuilder(
-            "/usr/bin/java",
+            javaPath,
             "-jar", "./test-app/build/libs/test-app-1.0-SNAPSHOT-all.jar"
         ).inheritIO().start()
         runningProcs.add(targetProc)
@@ -58,7 +61,7 @@ class IntegrationTests : StringSpec({
 
         // Attach the agent:
         val agentAttachProc = ProcessBuilder(
-            "/usr/bin/java",
+            javaPath,
             "-jar", "./build/libs/http-proxy-agent-1.0-SNAPSHOT-all.jar",
             targetProc.pid().toString(), proxyHost, wireMockServer.port().toString(), certPath
         ).inheritIO().start()
