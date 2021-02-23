@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/jvm-http-proxy-agent.iml" filepath="$PROJECT_DIR$/.idea/jvm-http-proxy-agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test-app.iml" filepath="$PROJECT_DIR$/.idea/modules/test-app.iml" />
     </modules>
   </component>
 </project>

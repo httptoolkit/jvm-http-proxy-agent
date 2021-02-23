@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow'
+}
+
+group 'tech.httptoolkit'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
+    implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.0.3'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'
+    implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
+    implementation group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'tech.httptoolkit.testapp.Main'
+    }
+}
+
+compileJava {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+}
