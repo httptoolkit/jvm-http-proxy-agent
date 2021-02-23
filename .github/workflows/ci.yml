@@ -2,7 +2,7 @@ name: CI
 on: push
 jobs:
   build:
-    name: Build
+    name: Build & test
     runs-on: ubuntu-latest
 
     steps:
@@ -13,5 +13,5 @@ jobs:
         with:
           java-version: 14
 
-      - name: Build JAR with Gradle
-        run: ./gradlew shadowJar
+      - name: Build & test JAR with Gradle
+        run: ./gradlew test

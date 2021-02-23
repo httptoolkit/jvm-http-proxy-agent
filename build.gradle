@@ -28,6 +28,11 @@ dependencies {
     // Dependencies we load only as part of rewriting them, iff the target app includes them:
     compileOnly group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
     compileOnly group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.0.3'
+
+    // Test deps:
+    testImplementation group: 'io.kotest', name: 'kotest-runner-junit5-jvm', version: '4.4.0'
+    testImplementation group: 'io.kotest', name: 'kotest-assertions-core-jvm', version: '4.4.0'
+    testImplementation "com.github.tomakehurst:wiremock-jre8:2.27.2"
 }
 
 compileJava {
@@ -39,4 +44,11 @@ compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+test {
+    // We need to build both JARs before the integration tests can run
+    dependsOn('shadowJar')
+    dependsOn(':test-app:shadowJar')
+    useJUnitPlatform()
 }
