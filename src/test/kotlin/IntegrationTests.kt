@@ -16,7 +16,7 @@ const val proxyHost = "127.0.0.1"
 val certPath = resourcesPath.resolve("cert.pem").toAbsolutePath().toString()
 
 // We always launch subprocesses with the same Java that we're using ourselves
-val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toString()!!
+val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toString()
 
 val wireMockServer = WireMockServer(options()
     .dynamicPort()
@@ -68,12 +68,12 @@ class IntegrationTests : StringSpec({
         runningProcs.add(agentAttachProc)
 
         // Agent attacher should quit happily
-        agentAttachProc.waitFor(1, TimeUnit.SECONDS)
+        agentAttachProc.waitFor(2, TimeUnit.SECONDS)
         agentAttachProc.isAlive.shouldBe(false)
         agentAttachProc.exitValue().shouldBe(0)
 
         // Target should pick up proxy details & quit happily too
-        targetProc.waitFor(5, TimeUnit.SECONDS)
+        targetProc.waitFor(10, TimeUnit.SECONDS)
         targetProc.isAlive.shouldBe(false)
         targetProc.exitValue().shouldBe(0)
     }

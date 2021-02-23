@@ -46,7 +46,7 @@ public class Main {
 
             cases.forEach((name, clientCase) -> {
                 try {
-                    int result = clientCase.testNew(url);
+                    int result = clientCase.testExisting(url);
                     if (result != 200) {
                         System.out.println("Unexpected result for existing " + name + ": " + result);
                         allSuccessful.set(false);
