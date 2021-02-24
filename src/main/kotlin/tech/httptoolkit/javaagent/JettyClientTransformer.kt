@@ -5,10 +5,13 @@ import net.bytebuddy.asm.Advice
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
-import net.bytebuddy.matcher.ElementMatchers
 import net.bytebuddy.utility.JavaModule
 import net.bytebuddy.matcher.ElementMatchers.*
 import org.eclipse.jetty.util.ssl.SslContextFactory
+import tech.httptoolkit.javaagent.jettyclient.JettyResetDestinationsAdvice
+import tech.httptoolkit.javaagent.jettyclient.JettyReturnProxyConfigurationAdvice
+import tech.httptoolkit.javaagent.jettyclient.JettyReturnSslContextFactoryV10Advice
+import tech.httptoolkit.javaagent.jettyclient.JettyReturnSslContextFactoryV9Advice
 import java.util.*
 
 /**
@@ -22,13 +25,6 @@ import java.util.*
  * on each client.
  */
 class JettyClientTransformer : MatchingAgentTransformer {
-
-    companion object {
-        // This is used to cache the clients that have been fully configured (had any existing destinations
-        // reset) so that we don't unnecessarily reset them again later.
-        @JvmStatic
-        public val patchedHttpClients: MutableSet<Any> = Collections.newSetFromMap(WeakHashMap())
-    }
 
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder

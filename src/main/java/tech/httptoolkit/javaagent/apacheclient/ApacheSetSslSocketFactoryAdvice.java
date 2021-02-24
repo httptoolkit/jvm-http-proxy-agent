@@ -1,6 +1,7 @@
-package tech.httptoolkit.javaagent;
+package tech.httptoolkit.javaagent.apacheclient;
 
 import net.bytebuddy.asm.Advice;
+import tech.httptoolkit.javaagent.HttpProxyAgent;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

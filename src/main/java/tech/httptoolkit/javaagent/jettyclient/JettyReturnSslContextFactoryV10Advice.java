@@ -1,7 +1,8 @@
-package tech.httptoolkit.javaagent;
+package tech.httptoolkit.javaagent.jettyclient;
 
 import net.bytebuddy.asm.Advice;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import tech.httptoolkit.javaagent.HttpProxyAgent;
 
 public class JettyReturnSslContextFactoryV10Advice {
     @Advice.OnMethodExit

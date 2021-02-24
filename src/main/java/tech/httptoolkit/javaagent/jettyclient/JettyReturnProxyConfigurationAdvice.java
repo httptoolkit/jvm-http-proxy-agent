@@ -1,9 +1,10 @@
-package tech.httptoolkit.javaagent;
+package tech.httptoolkit.javaagent.jettyclient;
 
 import net.bytebuddy.asm.Advice;
 import org.eclipse.jetty.client.HttpProxy;
 import org.eclipse.jetty.client.Origin;
 import org.eclipse.jetty.client.ProxyConfiguration;
+import tech.httptoolkit.javaagent.HttpProxyAgent;
 
 public class JettyReturnProxyConfigurationAdvice {
     @Advice.OnMethodExit

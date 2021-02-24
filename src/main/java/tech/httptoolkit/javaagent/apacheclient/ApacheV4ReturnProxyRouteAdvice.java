@@ -1,8 +1,9 @@
-package tech.httptoolkit.javaagent;
+package tech.httptoolkit.javaagent.apacheclient;
 
 import net.bytebuddy.asm.Advice;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.routing.HttpRoute;
+import tech.httptoolkit.javaagent.HttpProxyAgent;
 
 public class ApacheV4ReturnProxyRouteAdvice {
     @Advice.OnMethodExit

@@ -1,4 +1,4 @@
-package tech.httptoolkit.javaagent;
+package tech.httptoolkit.javaagent.jettyclient;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 

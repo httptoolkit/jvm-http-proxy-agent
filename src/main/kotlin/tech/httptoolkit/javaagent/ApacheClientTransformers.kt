@@ -6,6 +6,9 @@ import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.matcher.ElementMatchers.*
 import net.bytebuddy.utility.JavaModule
+import tech.httptoolkit.javaagent.apacheclient.ApacheSetSslSocketFactoryAdvice
+import tech.httptoolkit.javaagent.apacheclient.ApacheV4ReturnProxyRouteAdvice
+import tech.httptoolkit.javaagent.apacheclient.ApacheV5ReturnProxyRouteAdvice
 
 // For both v4 & v5 we override all implementations of the RoutePlanner interface, and we redefine all routes
 // to go via our proxy instead of their existing configuration.
