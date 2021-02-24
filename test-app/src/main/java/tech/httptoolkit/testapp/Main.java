@@ -19,7 +19,8 @@ public class Main {
             "okhttp-v4", new OkHttpV4Case(),
             "retrofit", new RetrofitCase(),
             "jetty-client", new JettyClientCase(),
-            "async-http-client", new AsyncHttpClientCase()
+            "async-http-client", new AsyncHttpClientCase(),
+            "spring-web", new SpringWebClientCase()
     );
 
     public static void main(String[] args) throws Exception {
@@ -27,7 +28,7 @@ public class Main {
         String pid = runtimeName.split("@")[0];
         System.out.println("PID: " + pid); // Purely for convenient manual attachment to this process
 
-        String url = "https://example.test"; // Invalid URL: this should always fail to resolve
+        String url = "https://httpbin.org/404/"; // Always returns a 404, quelle surprise
 
         while (true) {
             AtomicBoolean allSuccessful = new AtomicBoolean(true);

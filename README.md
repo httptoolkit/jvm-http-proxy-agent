@@ -17,6 +17,8 @@ Traffic can be captured from at least:
 - [x] Retrofit
 - [x] Jetty-Client v9, 10 & 11
 - [x] Async-Http-Client
+- [x] Reactor-Netty
+- [x] Spring WebClient
 
 This will also capture HTTP(S) from any downstream libraries based on each of these clients, and many other untested clients sharing similar implementations, and so should cover a very large percentage of HTTP client usage.
 

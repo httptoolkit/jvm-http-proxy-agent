@@ -1,15 +1,9 @@
 package tech.httptoolkit.testapp.cases;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
 public abstract class ClientCase<T> {
 
     public abstract T newClient(String url) throws Exception;
-    public abstract int test(String url, T client) throws IOException, InterruptedException, ExecutionException, TimeoutException;
+    public abstract int test(String url, T client) throws Exception;
 
     private String existingClientUrl;
     private T client;

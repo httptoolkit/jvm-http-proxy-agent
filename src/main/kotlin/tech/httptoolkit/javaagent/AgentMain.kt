@@ -81,7 +81,8 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         JavaClientTransformer(),
         JettyClientTransformer(),
         AsyncHttpClientConfigTransformer(),
-        AsyncHttpChannelManagerTransformer()
+        AsyncHttpChannelManagerTransformer(),
+        ReactorNettyClientConfigTransformer()
     ).forEach { matchingAgentTransformer ->
         agentBuilder = matchingAgentTransformer.register(agentBuilder)
     }
