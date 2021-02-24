@@ -74,6 +74,7 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         ApacheClientRoutingV5Transformer(),
         ApacheSslSocketFactoryTransformer(),
         JavaClientTransformer(),
+        JettyClientTransformer()
     ).forEach { matchingAgentTransformer ->
         agentBuilder = matchingAgentTransformer.register(agentBuilder)
     }

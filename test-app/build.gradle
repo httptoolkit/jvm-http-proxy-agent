@@ -16,6 +16,7 @@ dependencies {
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'
     implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
     implementation group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.9.0'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-client', version: '11.0.1'
 }
 
 test {

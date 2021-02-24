@@ -17,7 +17,8 @@ public class Main {
             "java-http-client", new JavaHttpClientCase(),
             "okhttp-v2", new OkHttpV2Case(),
             "okhttp-v4", new OkHttpV4Case(),
-            "retrofit", new RetrofitCase()
+            "retrofit", new RetrofitCase(),
+            "jetty-client", new JettyClientCase()
     );
 
     public static void main(String[] args) throws Exception {
