@@ -54,3 +54,21 @@ test {
     dependsOn(':test-app:shadowJar')
     useJUnitPlatform()
 }
+
+shadowJar {
+    minimize()
+    exclude '**/*.kotlin_metadata'
+    exclude '**/*.kotlin_module'
+    exclude '**/*.kotlin_builtins'
+    exclude '**/module_info.class'
+    exclude 'META-INF/maven/**'
+}
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+    prefix = "tech.httptoolkit.relocated"
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
