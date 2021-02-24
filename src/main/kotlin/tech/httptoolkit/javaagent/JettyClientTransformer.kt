@@ -2,10 +2,13 @@ package tech.httptoolkit.javaagent
 
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.asm.Advice
+import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
+import net.bytebuddy.matcher.ElementMatchers
 import net.bytebuddy.utility.JavaModule
 import net.bytebuddy.matcher.ElementMatchers.*
+import org.eclipse.jetty.util.ssl.SslContextFactory
 import java.util.*
 
 /**
@@ -43,8 +46,14 @@ class JettyClientTransformer : MatchingAgentTransformer {
         return builder
             .visit(Advice.to(JettyReturnProxyConfigurationAdvice::class.java)
                 .on(hasMethodName("getProxyConfiguration")))
-            .visit(Advice.to(JettyReturnSslContextFactoryAdvice::class.java)
-                .on(hasMethodName("getSslContextFactory")))
+            .visit(Advice.to(JettyReturnSslContextFactoryV10Advice::class.java)
+                .on(hasMethodName<MethodDescription>("getSslContextFactory").and(
+                    returns(SslContextFactory.Client::class.java)
+                )))
+            .visit(Advice.to(JettyReturnSslContextFactoryV9Advice::class.java)
+                .on(hasMethodName<MethodDescription>("getSslContextFactory").and(
+                    returns(SslContextFactory::class.java)
+                )))
             .visit(Advice.to(JettyResetDestinationsAdvice::class.java)
                 .on(hasMethodName("resolveDestination")))
     }
