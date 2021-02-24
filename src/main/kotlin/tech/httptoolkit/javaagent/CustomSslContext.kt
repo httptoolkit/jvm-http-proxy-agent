@@ -8,7 +8,7 @@ import java.security.cert.CertificateFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 
-fun buildSslContextForCertificate(certPath: String): SSLContext {
+fun buildTrustManagerFactoryForCertificate(certPath: String): TrustManagerFactory {
     val certFile = File(certPath)
     val certificate: Certificate = CertificateFactory.getInstance("X.509")
         .generateCertificate(FileInputStream(certFile))
@@ -19,9 +19,11 @@ fun buildSslContextForCertificate(certPath: String): SSLContext {
 
     val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
     trustManagerFactory.init(keyStore)
+    return trustManagerFactory
+}
 
+fun buildSslContextForCertificate(trustManagerFactory: TrustManagerFactory): SSLContext {
     val sslContext = SSLContext.getInstance("TLS")
     sslContext.init(null, trustManagerFactory.trustManagers, null)
-
     return sslContext
 }

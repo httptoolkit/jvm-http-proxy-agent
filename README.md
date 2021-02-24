@@ -16,6 +16,7 @@ Traffic can be captured from at least:
 - [x] OkHttp v2, v3 & v4
 - [x] Retrofit
 - [x] Jetty-Client v9, 10 & 11
+- [x] Async-Http-Client
 
 This will also capture HTTP(S) from any downstream libraries based on each of these clients, and many other untested clients sharing similar implementations, and so should cover a very large percentage of HTTP client usage.
 

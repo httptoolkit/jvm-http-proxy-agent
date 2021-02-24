@@ -18,7 +18,8 @@ public class Main {
             "okhttp-v2", new OkHttpV2Case(),
             "okhttp-v4", new OkHttpV4Case(),
             "retrofit", new RetrofitCase(),
-            "jetty-client", new JettyClientCase()
+            "jetty-client", new JettyClientCase(),
+            "async-http-client", new AsyncHttpClientCase()
     );
 
     public static void main(String[] args) throws Exception {

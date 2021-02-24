@@ -10,9 +10,13 @@ import java.lang.instrument.Instrumentation
 import javax.net.ssl.SSLContext
 import java.net.*
 import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.TrustManagerFactory
 
 
 lateinit var InterceptedSslContext: SSLContext
+    private set
+
+lateinit var InterceptedTrustManagerFactory: TrustManagerFactory
     private set
 
 lateinit var AgentProxyHost: String
@@ -48,7 +52,8 @@ fun agentmain(arguments: String?, instrumentation: Instrumentation) {
 fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
     val (certPath, proxyHost, proxyPort) = config
 
-    InterceptedSslContext = buildSslContextForCertificate(certPath)
+    InterceptedTrustManagerFactory = buildTrustManagerFactoryForCertificate(certPath)
+    InterceptedSslContext = buildSslContextForCertificate(InterceptedTrustManagerFactory)
     AgentProxyHost = proxyHost
     AgentProxyPort = proxyPort
 
@@ -74,7 +79,9 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         ApacheClientRoutingV5Transformer(),
         ApacheSslSocketFactoryTransformer(),
         JavaClientTransformer(),
-        JettyClientTransformer()
+        JettyClientTransformer(),
+        AsyncHttpClientConfigTransformer(),
+        AsyncHttpChannelManagerTransformer()
     ).forEach { matchingAgentTransformer ->
         agentBuilder = matchingAgentTransformer.register(agentBuilder)
     }

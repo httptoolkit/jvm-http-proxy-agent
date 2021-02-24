@@ -29,6 +29,7 @@ dependencies {
     compileOnly group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
     compileOnly group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.0.3'
     compileOnly group: 'org.eclipse.jetty', name: 'jetty-client', version: '11.0.1'
+    compileOnly group: 'org.asynchttpclient', name: 'async-http-client', version: '2.12.2'
 
     // Test deps:
     testImplementation group: 'io.kotest', name: 'kotest-runner-junit5-jvm', version: '4.4.0'

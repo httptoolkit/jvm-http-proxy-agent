@@ -74,8 +74,8 @@ class IntegrationTests : StringSpec({
         agentAttachProc.isAlive.shouldBe(false)
         agentAttachProc.exitValue().shouldBe(0)
 
-        // Target should pick up proxy details & quit happily too
-        targetProc.waitFor(10, TimeUnit.SECONDS)
+        // Target should pick up proxy details & quit happily, eventually
+        targetProc.waitFor(15, TimeUnit.SECONDS)
         targetProc.isAlive.shouldBe(false)
         targetProc.exitValue().shouldBe(0)
     }

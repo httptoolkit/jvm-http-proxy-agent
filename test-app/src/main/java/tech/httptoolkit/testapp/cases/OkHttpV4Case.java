@@ -20,6 +20,7 @@ public class OkHttpV4Case extends ClientCase<OkHttpClient> {
                 .build();
 
         Response response = client.newCall(request).execute();
+        response.body().close();
         return response.code();
     }
 }
