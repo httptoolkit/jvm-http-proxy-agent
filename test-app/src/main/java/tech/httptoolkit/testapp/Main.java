@@ -28,7 +28,9 @@ public class Main {
         entry("jetty-client", new JettyClientCase()),
         entry("async-http-client", new AsyncHttpClientCase()),
         entry("spring-web", new SpringWebClientCase()),
-        entry("ktor-cio", new KtorCioCase())
+        entry("ktor-cio", new KtorCioCase()),
+        entry("akka-req-http", new AkkaRequestClientCase()),
+        entry("akka-host-http", new AkkaHostClientCase())
     );
 
     public static void main(String[] args) throws Exception {

@@ -28,6 +28,10 @@ dependencies {
 
     implementation group: 'io.ktor', name: 'ktor-client-core', version: '1.5.2'
     implementation group: 'io.ktor', name: 'ktor-client-cio', version: '1.5.2'
+
+    implementation group: 'com.typesafe.akka', name: 'akka-actor_2.13', version: '2.6.13'
+    implementation group: 'com.typesafe.akka', name: 'akka-http_2.13', version: '10.2.4'
+    implementation group: 'com.typesafe.akka', name: 'akka-stream_2.13', version: '2.6.13'
 }
 
 test {
@@ -43,4 +47,13 @@ jar {
 compileJava {
     sourceCompatibility = '11'
     targetCompatibility = '11'
+}
+
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+
+shadowJar {
+    transform(AppendingTransformer) {
+        resource = 'reference.conf' // Required for akka
+    }
+    with jar
 }

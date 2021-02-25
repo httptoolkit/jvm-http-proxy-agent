@@ -40,6 +40,8 @@ dependencies {
     compileOnly group: 'io.projectreactor.netty', name: 'reactor-netty', version: '1.0.4'
     compileOnly group: 'io.ktor', name: 'ktor-client-core', version: '1.5.2'
     compileOnly group: 'io.ktor', name: 'ktor-client-cio', version: '1.5.2'
+    compileOnly group: 'com.typesafe.akka', name: 'akka-http-core_2.13', version: '10.2.4'
+    compileOnly group: 'com.typesafe.akka', name: 'akka-actor_2.13', version: '2.6.13'
 
     // Test deps:
     testImplementation group: 'io.kotest', name: 'kotest-runner-junit5-jvm', version: '4.4.0'
