@@ -78,6 +78,7 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         ApacheClientRoutingV4Transformer(),
         ApacheClientRoutingV5Transformer(),
         ApacheSslSocketFactoryTransformer(),
+        ApacheClientTlsStrategyTransformer(),
         JavaClientTransformer(),
         JettyClientTransformer(),
         AsyncHttpClientConfigTransformer(),

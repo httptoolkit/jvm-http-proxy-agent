@@ -10,20 +10,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.lang.Thread.sleep;
+import static java.util.Map.entry;
 
 public class Main {
 
-    private static final Map<String, ClientCase<?>> cases = Map.of(
-            "apache-v4", new ApacheHttpClientV4Case(),
-            "apache-v5", new ApacheHttpClientV5Case(),
-            "http-url-conn", new HttpUrlConnCase(),
-            "java-http-client", new JavaHttpClientCase(),
-            "okhttp-v2", new OkHttpV2Case(),
-            "okhttp-v4", new OkHttpV4Case(),
-            "retrofit", new RetrofitCase(),
-            "jetty-client", new JettyClientCase(),
-            "async-http-client", new AsyncHttpClientCase(),
-            "spring-web", new SpringWebClientCase()
+    private static final Map<String, ClientCase<?>> cases = Map.ofEntries(
+        entry("apache-v4", new ApacheHttpClientV4Case()),
+        entry("apache-v5", new ApacheHttpClientV5Case()),
+        entry("apache-async-v4", new ApacheHttpAsyncClientV4Case()),
+        entry("apache-async-v5", new ApacheHttpAsyncClientV5Case()),
+        entry("http-url-conn", new HttpUrlConnCase()),
+        entry("java-http-client", new JavaHttpClientCase()),
+        entry("okhttp-v2", new OkHttpV2Case()),
+        entry("okhttp-v4", new OkHttpV4Case()),
+        entry("retrofit", new RetrofitCase()),
+        entry("jetty-client", new JettyClientCase()),
+        entry("async-http-client", new AsyncHttpClientCase()),
+        entry("spring-web", new SpringWebClientCase())
     );
 
     public static void main(String[] args) throws Exception {
