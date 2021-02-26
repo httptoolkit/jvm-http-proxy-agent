@@ -3,8 +3,11 @@ package tech.httptoolkit.testapp;
 import tech.httptoolkit.testapp.cases.*;
 
 import java.lang.management.ManagementFactory;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static java.lang.Thread.sleep;
 
@@ -29,11 +32,15 @@ public class Main {
         System.out.println("PID: " + pid); // Purely for convenient manual attachment to this process
 
         String url = "https://httpbin.org/404/"; // Always returns a 404, quelle surprise
+        ExecutorService executor = Executors.newCachedThreadPool();
 
         while (true) {
             AtomicBoolean allSuccessful = new AtomicBoolean(true);
 
-            cases.forEach((name, clientCase) -> {
+            List<Future<Void>> tests = executor.invokeAll(cases.entrySet().stream().map((entry) -> ((Callable<Void>) () -> {
+                String name = entry.getKey();
+                ClientCase<?> clientCase = entry.getValue();
+
                 try {
                     int result = clientCase.testNew(url);
                     if (result != 200) {
@@ -45,9 +52,7 @@ public class Main {
                     System.out.println(e.toString());
                     allSuccessful.set(false);
                 }
-            });
 
-            cases.forEach((name, clientCase) -> {
                 try {
                     int result = clientCase.testExisting(url);
                     if (result != 200) {
@@ -58,7 +63,12 @@ public class Main {
                     System.out.println("Unexpected failure for existing " + name + ": " + e.toString());
                     allSuccessful.set(false);
                 }
-            });
+
+                return null;
+            })).collect(Collectors.toList()));
+
+            // Wait for all tests to complete
+            for (Future<Void> f: tests) { f.get(); }
 
             if (allSuccessful.get()) {
                 System.out.println("All cases intercepted successfully");
