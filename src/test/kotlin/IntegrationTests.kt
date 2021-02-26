@@ -41,7 +41,7 @@ class IntegrationTests : StringSpec({
         ).inheritIO().start()
         runningProcs.add(proc)
 
-        proc.waitFor(10, TimeUnit.SECONDS)
+        proc.waitFor(30, TimeUnit.SECONDS)
 
         proc.isAlive.shouldBe(false)
         proc.exitValue().shouldBe(0)
@@ -70,12 +70,12 @@ class IntegrationTests : StringSpec({
         runningProcs.add(agentAttachProc)
 
         // Agent attacher should quit happily
-        agentAttachProc.waitFor(2, TimeUnit.SECONDS)
+        agentAttachProc.waitFor(30, TimeUnit.SECONDS)
         agentAttachProc.isAlive.shouldBe(false)
         agentAttachProc.exitValue().shouldBe(0)
 
         // Target should pick up proxy details & quit happily, eventually
-        targetProc.waitFor(15, TimeUnit.SECONDS)
+        targetProc.waitFor(30, TimeUnit.SECONDS)
         targetProc.isAlive.shouldBe(false)
         targetProc.exitValue().shouldBe(0)
     }
