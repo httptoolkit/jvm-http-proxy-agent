@@ -8,7 +8,7 @@ import net.bytebuddy.utility.JavaModule
 import net.bytebuddy.matcher.ElementMatchers.*
 
 
-class JavaClientTransformer : MatchingAgentTransformer {
+class JavaClientTransformer(logger: TransformationLogger): MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -18,12 +18,7 @@ class JavaClientTransformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             .visit(Advice.to(ReturnProxySelectorAdvice::class.java)
                 .on(hasMethodName("proxy")))

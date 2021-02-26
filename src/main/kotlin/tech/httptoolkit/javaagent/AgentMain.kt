@@ -4,8 +4,11 @@ package tech.httptoolkit.javaagent
 
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.builder.AgentBuilder
+import net.bytebuddy.description.type.TypeDescription
+import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.dynamic.scaffold.TypeValidation
 import net.bytebuddy.matcher.ElementMatchers.none
+import net.bytebuddy.utility.JavaModule
 import java.lang.instrument.Instrumentation
 import javax.net.ssl.SSLContext
 import java.net.*
@@ -61,6 +64,9 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
     setDefaultProxy(proxyHost, proxyPort)
     setDefaultSslContext(InterceptedSslContext)
 
+    val debugMode = !System.getenv("DEBUG_JVM_HTTP_PROXY_AGENT").isNullOrEmpty()
+    val logger = TransformationLogger(debugMode)
+
     // Disabling type validation allows us to intercept non-Java types, e.g. Kotlin
     // in OkHttp. See https://github.com/raphw/byte-buddy/issues/764
     var agentBuilder = AgentBuilder.Default(
@@ -70,20 +76,20 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
         .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
         .disableClassFormatChanges()
-        .with(AgentBuilder.Listener.StreamWriting.toSystemOut().withTransformationsOnly())
+        .with(logger)
 
     arrayOf(
-        OkHttpClientV3Transformer(),
-        OkHttpClientV2Transformer(),
-        ApacheClientRoutingV4Transformer(),
-        ApacheClientRoutingV5Transformer(),
-        ApacheSslSocketFactoryTransformer(),
-        ApacheClientTlsStrategyTransformer(),
-        JavaClientTransformer(),
-        JettyClientTransformer(),
-        AsyncHttpClientConfigTransformer(),
-        AsyncHttpChannelManagerTransformer(),
-        ReactorNettyClientConfigTransformer()
+        OkHttpClientV3Transformer(logger),
+        OkHttpClientV2Transformer(logger),
+        ApacheClientRoutingV4Transformer(logger),
+        ApacheClientRoutingV5Transformer(logger),
+        ApacheSslSocketFactoryTransformer(logger),
+        ApacheClientTlsStrategyTransformer(logger),
+        JavaClientTransformer(logger),
+        JettyClientTransformer(logger),
+        AsyncHttpClientConfigTransformer(logger),
+        AsyncHttpChannelManagerTransformer(logger),
+        ReactorNettyClientConfigTransformer(logger)
     ).forEach { matchingAgentTransformer ->
         agentBuilder = matchingAgentTransformer.register(agentBuilder)
     }
@@ -93,8 +99,19 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
     println("HTTP Toolkit interception active")
 }
 
-interface MatchingAgentTransformer : AgentBuilder.Transformer {
-    fun register(builder: AgentBuilder): AgentBuilder
+abstract class MatchingAgentTransformer(private val logger: TransformationLogger) : AgentBuilder.Transformer {
+    abstract fun register(builder: AgentBuilder): AgentBuilder
+    abstract fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*>
+
+    override fun transform(
+        builder: DynamicType.Builder<*>,
+        typeDescription: TypeDescription,
+        classLoader: ClassLoader?,
+        module: JavaModule?
+    ): DynamicType.Builder<*> {
+        logger.beforeTransformation(typeDescription)
+        return transform(builder)
+    }
 }
 
 private fun setDefaultProxy(proxyHost: String, proxyPort: Int) {

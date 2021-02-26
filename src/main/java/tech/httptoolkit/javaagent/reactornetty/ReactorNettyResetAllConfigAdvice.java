@@ -27,7 +27,6 @@ public class ReactorNettyResetAllConfigAdvice {
     public static final Field proxyProviderField;
 
     static {
-        System.out.println("Running netty reset static initializer");
         try {
             // Initialize our intercepted SSL provider:
             agentSslProvider = SslProvider.builder()

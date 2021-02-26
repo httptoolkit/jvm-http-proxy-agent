@@ -2,9 +2,7 @@ package tech.httptoolkit.javaagent
 
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.asm.Advice
-import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
-import net.bytebuddy.utility.JavaModule
 import net.bytebuddy.matcher.ElementMatchers.*
 import tech.httptoolkit.javaagent.asynchttpclient.AsyncHttpClientReturnProxySelectorAdvice
 import tech.httptoolkit.javaagent.asynchttpclient.AsyncHttpClientReturnSslContextAdvice
@@ -12,7 +10,7 @@ import tech.httptoolkit.javaagent.asynchttpclient.AsyncHttpResetSslEngineFactory
 
 // For new clients, we just need to override the properties on the convenient config
 // class that contains both proxy & SSL configuration.
-class AsyncHttpClientConfigTransformer : MatchingAgentTransformer {
+class AsyncHttpClientConfigTransformer(logger: TransformationLogger) : MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -22,12 +20,7 @@ class AsyncHttpClientConfigTransformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             .visit(Advice.to(AsyncHttpClientReturnSslContextAdvice::class.java)
                 .on(hasMethodName("getSslContext")))
@@ -38,7 +31,7 @@ class AsyncHttpClientConfigTransformer : MatchingAgentTransformer {
 
 // For existing classes, we need to hook SSL Handler creation, called for
 // every new connection
-class AsyncHttpChannelManagerTransformer : MatchingAgentTransformer {
+class AsyncHttpChannelManagerTransformer(logger: TransformationLogger) : MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -46,12 +39,7 @@ class AsyncHttpChannelManagerTransformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             .visit(Advice.to(AsyncHttpResetSslEngineFactoryAdvice::class.java)
                 .on(hasMethodName("createSslHandler")))

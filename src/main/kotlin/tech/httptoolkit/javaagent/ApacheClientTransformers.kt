@@ -2,10 +2,8 @@ package tech.httptoolkit.javaagent
 
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.asm.Advice
-import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.matcher.ElementMatchers.*
-import net.bytebuddy.utility.JavaModule
 import tech.httptoolkit.javaagent.apacheclient.ApacheSetSslSocketFactoryAdvice
 import tech.httptoolkit.javaagent.apacheclient.ApacheV4ReturnProxyRouteAdvice
 import tech.httptoolkit.javaagent.apacheclient.ApacheV5ReturnProxyRouteAdvice
@@ -13,7 +11,7 @@ import tech.httptoolkit.javaagent.apacheclient.ApacheV5ReturnProxyRouteAdvice
 // For both v4 & v5 we override all implementations of the RoutePlanner interface, and we redefine all routes
 // to go via our proxy instead of their existing configuration.
 
-class ApacheClientRoutingV4Transformer : MatchingAgentTransformer {
+class ApacheClientRoutingV4Transformer(logger: TransformationLogger) : MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder.type(
             hasSuperType(named("org.apache.http.conn.routing.HttpRoutePlanner"))
@@ -22,12 +20,7 @@ class ApacheClientRoutingV4Transformer : MatchingAgentTransformer {
         ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder.visit(
             Advice.to(ApacheV4ReturnProxyRouteAdvice::class.java)
                 .on(hasMethodName("determineRoute"))
@@ -35,7 +28,7 @@ class ApacheClientRoutingV4Transformer : MatchingAgentTransformer {
     }
 }
 
-class ApacheClientRoutingV5Transformer : MatchingAgentTransformer {
+class ApacheClientRoutingV5Transformer(logger: TransformationLogger) : MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder.type(
             hasSuperType(named("org.apache.hc.client5.http.routing.HttpRoutePlanner"))
@@ -44,12 +37,7 @@ class ApacheClientRoutingV5Transformer : MatchingAgentTransformer {
         ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder.visit(
             Advice.to(ApacheV5ReturnProxyRouteAdvice::class.java)
                 .on(hasMethodName("determineRoute"))
@@ -61,7 +49,7 @@ class ApacheClientRoutingV5Transformer : MatchingAgentTransformer {
 // socket is created, the SSL context is replaced with our configured SslSocketFactory that uses our configured
 // SSLContext, which trusts our certificate, straight after initialization.
 
-class ApacheSslSocketFactoryTransformer : MatchingAgentTransformer {
+class ApacheSslSocketFactoryTransformer(logger: TransformationLogger) : MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -72,12 +60,7 @@ class ApacheSslSocketFactoryTransformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             .visit(
             Advice.to(ApacheSetSslSocketFactoryAdvice::class.java)

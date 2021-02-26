@@ -17,7 +17,7 @@ import net.bytebuddy.matcher.ElementMatchers.*
  * Without this, proxy settings work by default, but certificates do not - OkHttp
  * only trusts the default built-in certificates, and refuses ours.
  */
-class OkHttpClientV3Transformer : MatchingAgentTransformer {
+class OkHttpClientV3Transformer(logger: TransformationLogger): MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -25,12 +25,7 @@ class OkHttpClientV3Transformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             // v3 uses proxy() functions, while v4 uses Kotlin getters that compile to the same thing
             .visit(Advice.to(ReturnProxyAdvice::class.java)
@@ -52,7 +47,7 @@ class OkHttpClientV3Transformer : MatchingAgentTransformer {
  * Without this, proxy settings work by default, but certificates do not - OkHttp
  * only trusts the default built-in certificates, and refuses ours.
  */
-class OkHttpClientV2Transformer : MatchingAgentTransformer {
+class OkHttpClientV2Transformer(logger: TransformationLogger): MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -60,12 +55,7 @@ class OkHttpClientV2Transformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             // v2 uses getX methods:
             .visit(Advice.to(ReturnProxyAdvice::class.java)

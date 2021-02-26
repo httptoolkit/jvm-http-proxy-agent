@@ -3,16 +3,13 @@ package tech.httptoolkit.javaagent
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.asm.Advice
 import net.bytebuddy.description.method.MethodDescription
-import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
-import net.bytebuddy.utility.JavaModule
 import net.bytebuddy.matcher.ElementMatchers.*
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import tech.httptoolkit.javaagent.jettyclient.JettyResetDestinationsAdvice
 import tech.httptoolkit.javaagent.jettyclient.JettyReturnProxyConfigurationAdvice
 import tech.httptoolkit.javaagent.jettyclient.JettyReturnSslContextFactoryV10Advice
 import tech.httptoolkit.javaagent.jettyclient.JettyReturnSslContextFactoryV9Advice
-import java.util.*
 
 /**
  * Transforms the JettyClient to use our proxy & trust our certificate.
@@ -24,7 +21,7 @@ import java.util.*
  * (internal connection pools) when resolveDestination is first called
  * on each client.
  */
-class JettyClientTransformer : MatchingAgentTransformer {
+class JettyClientTransformer(logger: TransformationLogger): MatchingAgentTransformer(logger) {
 
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
@@ -33,12 +30,7 @@ class JettyClientTransformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             .visit(Advice.to(JettyReturnProxyConfigurationAdvice::class.java)
                 .on(hasMethodName("getProxyConfiguration")))

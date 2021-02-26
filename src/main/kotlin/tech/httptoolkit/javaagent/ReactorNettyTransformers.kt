@@ -14,7 +14,7 @@ import tech.httptoolkit.javaagent.reactornetty.ReactorNettyResetAllConfigAdvice
 // that receives the config as part of every single HTTP request - we hook that to reset the relevant
 // config props every time they're used.
 
-class ReactorNettyClientConfigTransformer : MatchingAgentTransformer {
+class ReactorNettyClientConfigTransformer(logger: TransformationLogger): MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             .type(
@@ -24,12 +24,7 @@ class ReactorNettyClientConfigTransformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             .visit(Advice.to(ReactorNettyResetAllConfigAdvice::class.java)
                 .on(isConstructor<MethodDescription>().and(

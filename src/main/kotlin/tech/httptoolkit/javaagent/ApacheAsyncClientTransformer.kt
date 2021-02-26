@@ -19,7 +19,7 @@ import tech.httptoolkit.javaagent.apacheclient.ApacheV5ReturnProxyRouteAdvice
 // AbstractClientTlsStrategy, which does this, but there's other examples too. We hook upgrade(), so that that
 // field is reset to use our context before any client TLS upgrade happens.
 
-class ApacheClientTlsStrategyTransformer : MatchingAgentTransformer {
+class ApacheClientTlsStrategyTransformer(logger: TransformationLogger) : MatchingAgentTransformer(logger) {
     override fun register(builder: AgentBuilder): AgentBuilder {
         return builder
             // For v5 we need to hook into every client TlsStrategy (of which there are many).
@@ -42,16 +42,11 @@ class ApacheClientTlsStrategyTransformer : MatchingAgentTransformer {
             ).transform(this)
     }
 
-    override fun transform(
-        builder: DynamicType.Builder<*>,
-        typeDescription: TypeDescription,
-        classLoader: ClassLoader?,
-        module: JavaModule?
-    ): DynamicType.Builder<*>? {
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
         return builder
             .visit(
-            Advice.to(OverrideSslContextFieldAdvice::class.java)
-                .on(hasMethodName("upgrade"))
-        );
+                Advice.to(OverrideSslContextFieldAdvice::class.java)
+                    .on(hasMethodName("upgrade"))
+            )
     }
 }
