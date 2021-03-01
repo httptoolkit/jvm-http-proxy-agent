@@ -5,7 +5,7 @@ import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.utility.JavaModule
 
-class TransformationLogger(val debugMode: Boolean) : AgentBuilder.Listener.Adapter() {
+class TransformationLogger(private val debugMode: Boolean) : AgentBuilder.Listener.Adapter() {
 
     private val transformingTypes: ArrayList<String> = ArrayList()
 
