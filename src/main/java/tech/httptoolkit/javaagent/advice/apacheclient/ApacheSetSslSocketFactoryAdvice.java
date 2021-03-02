@@ -1,15 +1,16 @@
 package tech.httptoolkit.javaagent.advice.apacheclient;
 
 import net.bytebuddy.asm.Advice;
-import tech.httptoolkit.javaagent.HttpProxyAgent;
 
+import javax.net.ssl.SSLContext;
 import java.lang.reflect.Field;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class ApacheSetSslSocketFactoryAdvice {
 
     @Advice.OnMethodEnter
-    public static void beforeCreateSocket(@Advice.This Object thisFactory) {
+    public static void beforeCreateSocket(@Advice.This Object thisFactory) throws Exception {
         // Before creating the socket - replace the SSL context so the new socket trusts us.
 
         boolean intercepted = false;
@@ -22,12 +23,8 @@ public class ApacheSetSslSocketFactoryAdvice {
                 field.setAccessible(true);
 
                 // Overwrite the socket factory with our own:
-                try {
-                    field.set(thisFactory, HttpProxyAgent.getInterceptedSslContext().getSocketFactory());
-                    intercepted = true;
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException("Could not intercept Apache HttpClient HTTPS sockets");
-                }
+                field.set(thisFactory, SSLContext.getDefault().getSocketFactory());
+                intercepted = true;
             } catch (NoSuchFieldException ignored) { }
         }
 
