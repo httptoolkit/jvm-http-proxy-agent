@@ -23,3 +23,18 @@ jobs:
 
       - name: Build & test the full distributable
         run: ./gradlew distTest
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: distributables
+          path: build/libs/*-dist.jar
+          if-no-files-found: error
+
+      - name: Publish tagged release
+        uses: svenstaro/upload-release-action@v2
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/libs/*-dist.jar
+          file_glob: true
+          tag: ${{ github.ref }}
