@@ -13,5 +13,5 @@ jobs:
         with:
           java-version: 14
 
-      - name: Build & test JAR with Gradle
-        run: ./gradlew test
+      - name: Build & test the agent standalone
+        run: ./gradlew quickTest

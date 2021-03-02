@@ -1,4 +1,4 @@
-package tech.httptoolkit.javaagent.apacheclient;
+package tech.httptoolkit.javaagent.advice.apacheclient;
 
 import net.bytebuddy.asm.Advice;
 import org.apache.http.HttpHost;

@@ -1,3 +1,13 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.sf.proguard:proguard-gradle:6.2.2'
+    }
+}
+
+
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.4.10'
@@ -9,21 +19,13 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://maven.google.com/"
+    }
 }
 
-jar {
-    manifest {
-        attributes 'Premain-Class': 'tech.httptoolkit.javaagent.HttpProxyAgent'
-        attributes 'Agent-Class': 'tech.httptoolkit.javaagent.HttpProxyAgent'
-        attributes 'Main-Class': 'tech.httptoolkit.javaagent.AttachMain'
-
-        attributes 'Can-Redefine-Classes': 'true'
-        attributes 'Can-Retransform-Classes': 'true'
-    }
-
-    // We include classes in our package. We *don't* include stub classes used to support multiple
-    // dependency versions, which are under their corresponding real package names.
-    include('tech/httptoolkit/javaagent/**/*')
+configurations {
+    r8
 }
 
 dependencies {
@@ -40,6 +42,9 @@ dependencies {
     testImplementation group: 'io.kotest', name: 'kotest-runner-junit5-jvm', version: '4.4.0'
     testImplementation group: 'io.kotest', name: 'kotest-assertions-core-jvm', version: '4.4.0'
     testImplementation "com.github.tomakehurst:wiremock-jre8:2.27.2"
+
+    // Only used during the R8 build task
+    r8 group: 'com.android.tools', name: 'r8', version: '2.1.75'
 }
 
 compileJava {
@@ -53,13 +58,19 @@ compileKotlin {
     }
 }
 
-test {
-    // We need to build both JARs before the integration tests can run
-    dependsOn('shadowJar')
-    dependsOn(':test-app:shadowJar')
-    useJUnitPlatform()
+tasks.withType(Jar) {
+    manifest {
+        attributes 'Premain-Class': 'tech.httptoolkit.javaagent.HttpProxyAgent'
+        attributes 'Agent-Class': 'tech.httptoolkit.javaagent.HttpProxyAgent'
+        attributes 'Main-Class': 'tech.httptoolkit.javaagent.AttachMain'
+
+        attributes 'Can-Redefine-Classes': 'true'
+        attributes 'Can-Retransform-Classes': 'true'
+    }
 }
 
+// First, we bundle everything into a workable standalone JAR, with all runtime source included plus
+// dependencies plus agent metadata:
 shadowJar {
     minimize()
     exclude '**/*.kotlin_metadata'
@@ -68,16 +79,82 @@ shadowJar {
     exclude '**/module_info.class'
     exclude 'META-INF/maven/**'
 
-    // We have to specifically exclude packages here, because we *do* want to include lots of non-local code, just not
-    // these specific client stubs:
+    // We have to specifically exclude our reactor stub code here, because we don't want to the type
+    // stubs that we've manually defined in our own source included here.
     exclude 'reactor/'
 }
 
+// As part of bundling the JAR, we relocate all dependencies into our namespace:
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-
 task relocateShadowJar(type: ConfigureShadowRelocation) {
     target = tasks.shadowJar
     prefix = "tech.httptoolkit.relocated"
 }
-
 tasks.shadowJar.dependsOn tasks.relocateShadowJar
+
+// Then we take this bundled JAR and optimize it. This shrinks it dramatically, but also breaks it, because
+// bytebuddy depends on some of our source being unmodified by R8 (frames in advice classes get messed with).
+def r8File = new File("$buildDir/libs/$archivesBaseName-r8.jar")
+tasks.register('r8Jar', JavaExec) { task ->
+    def rules = file('r8-rules.txt')
+    task.dependsOn(tasks.shadowJar)
+    task.outputs.file(r8File)
+
+    task.classpath(configurations.r8)
+    task.main = 'com.android.tools.r8.R8'
+    task.args = [
+            '--release',
+            '--classfile',
+            '--output', r8File.toString(),
+            '--pg-conf', rules.toString()
+    ] + configurations.compileOnly.collect {path ->
+         ['--lib', path.toString()] // Include libs from every runtime-only dep, so R8 can resolve them
+    }.flatten()
+
+    doFirst {
+        def java8Home = System.getenv("JAVA_HOME_8_X64")
+        if (java8Home == null || java8Home.empty) {
+            throw new GradleException("\$JAVA_HOME_8_X64 must be set to build a minified distributable")
+        } else {
+            // AFAICT R8 only supports the Java 8 lib files. We require that to be available, configured by env
+            task.args += "--lib"
+            task.args += java8Home
+        }
+
+        task.args += shadowJar.getArchiveFile().get().asFile.toString()
+    }
+}
+
+// Then we fix this, by taking the raw advice classes for our own source from the original bundled JAR (i.e. including
+// any relocated references) and combining that with the minified & optimized dependencies from R8, to get a single
+// bundled and 99% optimized JAR.
+task distJar(type: Jar) {
+    dependsOn(tasks.shadowJar, tasks.r8Jar)
+    archiveClassifier = 'dist'
+
+    // Pull raw advice classes from the shadow JAR, unminified:
+    from (zipTree(shadowJar.getArchiveFile())) {
+        include "tech/httptoolkit/javaagent/advice/**/*"
+    }
+
+    // Pull other source & bundled dependencies in their minified form, from R8:
+    from (zipTree(r8Jar.outputs.files[0])) {
+        exclude "tech/httptoolkit/javaagent/advice/**/*"
+    }
+}
+
+tasks.withType(Test) {
+    // We need to build both JARs before the integration tests can run
+    dependsOn('shadowJar')
+    dependsOn(':test-app:shadowJar')
+    useJUnitPlatform()
+}
+
+task quickTest(type: Test) {
+    environment 'TEST_JAR', tasks.shadowJar.getArchiveFile().get().asFile.toString()
+}
+
+task distTest(type: Test) {
+    environment 'TEST_JAR', tasks.distJar.getArchiveFile().get().asFile.toString()
+    dependsOn('distJar')
+}

@@ -6,10 +6,10 @@ import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.matcher.ElementMatchers.*
 import org.eclipse.jetty.util.ssl.SslContextFactory
-import tech.httptoolkit.javaagent.jettyclient.JettyResetDestinationsAdvice
-import tech.httptoolkit.javaagent.jettyclient.JettyReturnProxyConfigurationAdvice
-import tech.httptoolkit.javaagent.jettyclient.JettyReturnSslContextFactoryV10Advice
-import tech.httptoolkit.javaagent.jettyclient.JettyReturnSslContextFactoryV9Advice
+import tech.httptoolkit.javaagent.advice.jettyclient.JettyResetDestinationsAdvice
+import tech.httptoolkit.javaagent.advice.jettyclient.JettyReturnProxyConfigurationAdvice
+import tech.httptoolkit.javaagent.advice.jettyclient.JettyReturnSslContextFactoryV10Advice
+import tech.httptoolkit.javaagent.advice.jettyclient.JettyReturnSslContextFactoryV9Advice
 
 /**
  * Transforms the JettyClient to use our proxy & trust our certificate.

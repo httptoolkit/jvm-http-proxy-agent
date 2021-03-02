@@ -1,4 +1,4 @@
-package tech.httptoolkit.javaagent.reactornetty;
+package tech.httptoolkit.javaagent.advice.reactornetty;
 
 import io.netty.handler.ssl.SslContextBuilder;
 import net.bytebuddy.asm.Advice;

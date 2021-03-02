@@ -1,4 +1,4 @@
-package tech.httptoolkit.javaagent.asynchttpclient;
+package tech.httptoolkit.javaagent.advice.asynchttpclient;
 
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;

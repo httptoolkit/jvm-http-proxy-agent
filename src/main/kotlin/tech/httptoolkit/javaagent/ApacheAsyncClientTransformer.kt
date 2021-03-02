@@ -2,14 +2,9 @@ package tech.httptoolkit.javaagent
 
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.asm.Advice
-import net.bytebuddy.description.method.MethodDescription
-import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.matcher.ElementMatchers.*
-import net.bytebuddy.utility.JavaModule
-import tech.httptoolkit.javaagent.apacheclient.ApacheSetSslSocketFactoryAdvice
-import tech.httptoolkit.javaagent.apacheclient.ApacheV4ReturnProxyRouteAdvice
-import tech.httptoolkit.javaagent.apacheclient.ApacheV5ReturnProxyRouteAdvice
+import tech.httptoolkit.javaagent.advice.OverrideSslContextFieldAdvice
 
 // Apache async client hooks depend on the non-async Apache client transformers, which successfully transform proxy
 // configuration, but we need to separate re-transform TLS configuration too.

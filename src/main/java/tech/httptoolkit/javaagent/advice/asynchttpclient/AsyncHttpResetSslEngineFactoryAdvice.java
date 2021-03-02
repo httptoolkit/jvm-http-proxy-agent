@@ -1,4 +1,4 @@
-package tech.httptoolkit.javaagent.asynchttpclient;
+package tech.httptoolkit.javaagent.advice.asynchttpclient;
 
 import net.bytebuddy.asm.Advice;
 import org.asynchttpclient.AsyncHttpClientConfig;

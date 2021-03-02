@@ -1,4 +1,4 @@
-package tech.httptoolkit.javaagent;
+package tech.httptoolkit.javaagent.advice;
 
 import net.bytebuddy.asm.Advice;
 

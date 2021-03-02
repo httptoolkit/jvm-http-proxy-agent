@@ -2,10 +2,10 @@ package tech.httptoolkit.javaagent
 
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.asm.Advice
-import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
-import net.bytebuddy.utility.JavaModule
 import net.bytebuddy.matcher.ElementMatchers.*
+import tech.httptoolkit.javaagent.advice.ReturnProxySelectorAdvice
+import tech.httptoolkit.javaagent.advice.ReturnSslContextAdvice
 
 
 class JavaClientTransformer(logger: TransformationLogger): MatchingAgentTransformer(logger) {

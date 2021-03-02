@@ -1,6 +1,7 @@
-package tech.httptoolkit.javaagent;
+package tech.httptoolkit.javaagent.advice;
 
 import net.bytebuddy.asm.Advice;
+import tech.httptoolkit.javaagent.HttpProxyAgent;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;

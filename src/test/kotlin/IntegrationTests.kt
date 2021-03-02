@@ -12,7 +12,17 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 
-val resourcesPath = Paths.get("src", "test", "resources")!!
+// We require TEST_JAR to always be set when running the tests, giving us the appropriate path
+// to the specific agent jar that we're testing.
+val AGENT_JAR_PATH = System.getenv("TEST_JAR")!!
+val x = run {
+    println("Testing $AGENT_JAR_PATH")
+}
+
+// For the test-app JAR we just use a constant string
+val TEST_APP_JAR = Paths.get("test-app", "build", "libs", "test-app-1.0-SNAPSHOT-all.jar").toString()
+
+val resourcesPath: Path = Paths.get("src", "test", "resources")
 
 const val proxyHost = "127.0.0.1"
 val certPath = resourcesPath.resolve("cert.pem").toAbsolutePath().toString()
@@ -36,8 +46,8 @@ class IntegrationTests : StringSpec({
 
         val proc = ProcessBuilder(
             javaPath,
-            "-javaagent:./build/libs/http-proxy-agent-1.0-SNAPSHOT-all.jar=$agentArgs",
-            "-jar", "./test-app/build/libs/test-app-1.0-SNAPSHOT-all.jar"
+            "-javaagent:$AGENT_JAR_PATH=$agentArgs",
+            "-jar", TEST_APP_JAR
         ).inheritIO().start()
         runningProcs.add(proc)
 
@@ -51,7 +61,7 @@ class IntegrationTests : StringSpec({
         // Start up the target:
         val targetProc = ProcessBuilder(
             javaPath,
-            "-jar", "./test-app/build/libs/test-app-1.0-SNAPSHOT-all.jar"
+            "-jar", TEST_APP_JAR
         ).inheritIO().start()
         runningProcs.add(targetProc)
 
@@ -64,7 +74,7 @@ class IntegrationTests : StringSpec({
         // Attach the agent:
         val agentAttachProc = ProcessBuilder(
             javaPath,
-            "-jar", "./build/libs/http-proxy-agent-1.0-SNAPSHOT-all.jar",
+            "-jar", AGENT_JAR_PATH,
             targetProc.pid().toString(), proxyHost, wireMockServer.port().toString(), certPath
         ).inheritIO().start()
         runningProcs.add(agentAttachProc)

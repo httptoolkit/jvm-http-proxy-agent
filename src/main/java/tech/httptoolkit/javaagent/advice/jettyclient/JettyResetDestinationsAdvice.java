@@ -1,4 +1,4 @@
-package tech.httptoolkit.javaagent.jettyclient;
+package tech.httptoolkit.javaagent.advice.jettyclient;
 
 import net.bytebuddy.asm.Advice;
 import org.eclipse.jetty.client.*;

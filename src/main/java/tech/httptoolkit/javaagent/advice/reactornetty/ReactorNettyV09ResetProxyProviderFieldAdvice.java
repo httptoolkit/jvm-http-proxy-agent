@@ -1,4 +1,4 @@
-package tech.httptoolkit.javaagent.reactornetty;
+package tech.httptoolkit.javaagent.advice.reactornetty;
 
 import net.bytebuddy.asm.Advice;
 import reactor.netty.tcp.ProxyProvider;

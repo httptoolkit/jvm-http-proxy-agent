@@ -7,9 +7,10 @@ import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.matcher.ElementMatchers.*
-import tech.httptoolkit.javaagent.reactornetty.ReactorNettyResetAllConfigAdvice
-import tech.httptoolkit.javaagent.reactornetty.ReactorNettyResetHttpClientSecureSslAdvice
-import tech.httptoolkit.javaagent.reactornetty.ReactorNettyV09ResetProxyProviderFieldAdvice
+import tech.httptoolkit.javaagent.advice.ReturnProxyAddressAdvice
+import tech.httptoolkit.javaagent.advice.reactornetty.ReactorNettyResetAllConfigAdvice
+import tech.httptoolkit.javaagent.advice.reactornetty.ReactorNettyResetHttpClientSecureSslAdvice
+import tech.httptoolkit.javaagent.advice.reactornetty.ReactorNettyV09ResetProxyProviderFieldAdvice
 
 // To patch Reactor-Netty's v1 HTTP client, we hook the constructor of the client itself. It has a constructor
 // that receives the config as part of every single HTTP request - we hook that to reset the relevant
