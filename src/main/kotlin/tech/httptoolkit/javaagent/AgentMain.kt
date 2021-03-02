@@ -86,6 +86,10 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         ApacheSslSocketFactoryTransformer(logger),
         ApacheClientTlsStrategyTransformer(logger),
         JavaClientTransformer(logger),
+        UrlConnectionTransformer(logger),
+        HttpsUrlConnectionTransformer(logger),
+        ProxySelectorTransformer(logger),
+        SslContextTransformer(logger),
         JettyClientTransformer(logger),
         AsyncHttpClientConfigTransformer(logger),
         AsyncHttpChannelManagerTransformer(logger),
@@ -122,6 +126,10 @@ private fun setDefaultProxy(proxyHost: String, proxyPort: Int) {
     System.setProperty("http.proxyPort", proxyPort.toString())
     System.setProperty("https.proxyHost", proxyHost)
     System.setProperty("https.proxyPort", proxyPort.toString())
+
+    // We back up the properties in our namespace too, in case anybody manually overrides the above:
+    System.setProperty("tech.httptoolkit.proxyHost", proxyHost)
+    System.setProperty("tech.httptoolkit.proxyPort", proxyPort.toString())
 
     val proxySelector = ConstantProxySelector(proxyHost, proxyPort)
     AgentProxySelector = proxySelector
