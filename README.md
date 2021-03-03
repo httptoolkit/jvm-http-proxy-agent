@@ -12,8 +12,8 @@ Traffic can be captured from at least:
 
 - [x] Java's built-in HttpURLConnection
 - [x] Java 11's built-in HttpClient
-- [x] Apache HttpClient v4 & v5
-  [x] Apache HttpAsyncClient v4 & v5
+- [x] Apache HttpClient v3, v4 & v5
+- [x] Apache HttpAsyncClient v4 & v5
 - [x] OkHttp v2, v3 & v4
 - [x] Retrofit
 - [x] Jetty-Client v9, v10 & v11

@@ -13,6 +13,7 @@ import java.lang.instrument.Instrumentation
 import javax.net.ssl.SSLContext
 import java.net.*
 import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 
 
@@ -85,6 +86,9 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         ApacheClientRoutingV5Transformer(logger),
         ApacheSslSocketFactoryTransformer(logger),
         ApacheClientTlsStrategyTransformer(logger),
+        ApacheHostConfigurationTransformer(logger),
+        ApacheHttpMethodDirectorTransformer(logger),
+        ApacheProtocolTransformer(logger),
         JavaClientTransformer(logger),
         UrlConnectionTransformer(logger),
         HttpsUrlConnectionTransformer(logger),

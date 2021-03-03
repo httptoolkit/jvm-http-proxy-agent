@@ -11,12 +11,15 @@ repositories {
 }
 
 dependencies {
+    implementation group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.0.3'
     implementation group: 'org.apache.httpcomponents', name: 'httpasyncclient', version: '4.1.4'
+
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'
     implementation group: 'com.squareup.okhttp', name: 'okhttp', version: '2.7.5'
     implementation group: 'com.squareup.retrofit2', name: 'retrofit', version: '2.9.0'
+
     implementation group: 'org.eclipse.jetty', name: 'jetty-client', version: '10.0.0'
     implementation group: 'org.asynchttpclient', name: 'async-http-client', version: '2.12.2'
     implementation group: 'org.springframework', name: 'spring-webflux', version: '5.3.4'

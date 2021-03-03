@@ -15,6 +15,7 @@ import static java.util.Map.entry;
 public class Main {
 
     private static final Map<String, ClientCase<?>> cases = Map.ofEntries(
+        entry("apache-v3", new ApacheHttpClientV3Case()),
         entry("apache-v4", new ApacheHttpClientV4Case()),
         entry("apache-v5", new ApacheHttpClientV5Case()),
         entry("apache-async-v4", new ApacheHttpAsyncClientV4Case()),
