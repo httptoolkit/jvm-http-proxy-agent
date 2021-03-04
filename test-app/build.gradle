@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 group 'tech.httptoolkit'
@@ -24,6 +25,9 @@ dependencies {
     implementation group: 'org.asynchttpclient', name: 'async-http-client', version: '2.12.2'
     implementation group: 'org.springframework', name: 'spring-webflux', version: '5.3.4'
     implementation group: 'io.projectreactor.netty', name: 'reactor-netty', version: '1.0.4'
+
+    implementation group: 'io.ktor', name: 'ktor-client-core', version: '1.5.2'
+    implementation group: 'io.ktor', name: 'ktor-client-cio', version: '1.5.2'
 }
 
 test {

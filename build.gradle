@@ -38,6 +38,8 @@ dependencies {
     compileOnly group: 'org.eclipse.jetty', name: 'jetty-client', version: '11.0.1'
     compileOnly group: 'org.asynchttpclient', name: 'async-http-client', version: '2.12.2'
     compileOnly group: 'io.projectreactor.netty', name: 'reactor-netty', version: '1.0.4'
+    compileOnly group: 'io.ktor', name: 'ktor-client-core', version: '1.5.2'
+    compileOnly group: 'io.ktor', name: 'ktor-client-cio', version: '1.5.2'
 
     // Test deps:
     testImplementation group: 'io.kotest', name: 'kotest-runner-junit5-jvm', version: '4.4.0'

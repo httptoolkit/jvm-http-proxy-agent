@@ -100,7 +100,10 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         ReactorNettyClientConfigTransformer(logger),
         ReactorNettyProxyProviderTransformer(logger),
         ReactorNettyOverrideRequestAddressTransformer(logger),
-        ReactorNettyHttpClientSecureTransformer(logger)
+        ReactorNettyHttpClientSecureTransformer(logger),
+        KtorClientEngineConfigTransformer(logger),
+        KtorCioEngineTransformer(logger),
+        KtorClientTlsTransformer(logger)
     ).forEach { matchingAgentTransformer ->
         agentBuilder = matchingAgentTransformer.register(agentBuilder)
     }

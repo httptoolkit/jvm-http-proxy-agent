@@ -27,7 +27,8 @@ public class Main {
         entry("retrofit", new RetrofitCase()),
         entry("jetty-client", new JettyClientCase()),
         entry("async-http-client", new AsyncHttpClientCase()),
-        entry("spring-web", new SpringWebClientCase())
+        entry("spring-web", new SpringWebClientCase()),
+        entry("ktor-cio", new KtorCioCase())
     );
 
     public static void main(String[] args) throws Exception {

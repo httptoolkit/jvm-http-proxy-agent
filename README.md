@@ -20,6 +20,7 @@ Traffic can be captured from at least:
 - [x] Async-Http-Client
 - [x] Reactor-Netty v0.9 & v1+
 - [x] Spring WebClient
+- [x] Ktor-Client
 
 This will also capture HTTP(S) from any downstream libraries based on each of these clients, and many other untested clients sharing similar implementations, and so should cover a very large percentage of HTTP client usage.
 
