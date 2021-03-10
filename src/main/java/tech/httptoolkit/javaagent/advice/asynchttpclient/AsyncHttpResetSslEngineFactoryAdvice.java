@@ -12,7 +12,9 @@ public class AsyncHttpResetSslEngineFactoryAdvice {
 
     // Track each ChannelManager with a weak ref, to avoid unnecessary reflection overhead by only
     // initializing them once, instead of every request
-    public static Set<Object> patchedChannelManagers = Collections.newSetFromMap(new WeakHashMap());
+    public static Set<Object> patchedChannelManagers = Collections.newSetFromMap(
+        Collections.synchronizedMap(new WeakHashMap<>())
+    );
 
     @Advice.OnMethodEnter
     public static void createSslHandler(

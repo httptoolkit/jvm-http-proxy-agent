@@ -16,7 +16,9 @@ import java.util.concurrent.TimeoutException;
 
 public class ResetOldPoolsAdvice {
 
-    public static Set<PoolId> resetPoolIds = Collections.newSetFromMap(new WeakHashMap<>());
+    public static Set<PoolId> resetPoolIds = Collections.newSetFromMap(
+            Collections.synchronizedMap(new WeakHashMap<>())
+    );
 
     @Advice.OnMethodEnter
     public static void beforeDispatchRequest(

@@ -18,7 +18,9 @@ import java.util.concurrent.TimeoutException;
 // one per config, rather than one PoolMaster instance. Otherwise the logic should be identical.
 public class ResetOldGatewaysAdvice {
 
-    public static Set<HostConnectionPoolSetup> resetPoolSetups = Collections.newSetFromMap(new WeakHashMap<>());
+    public static Set<HostConnectionPoolSetup> resetPoolSetups = Collections.newSetFromMap(
+        Collections.synchronizedMap(new WeakHashMap<>())
+    );
 
     @Advice.OnMethodEnter
     public static void beforeDispatchRequest(
