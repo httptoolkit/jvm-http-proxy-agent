@@ -153,6 +153,7 @@ tasks.withType(Test) {
     dependsOn('shadowJar')
     dependsOn(':test-app:shadowJar')
     useJUnitPlatform()
+    outputs.upToDateWhen {false}
 }
 
 task quickTest(type: Test) {
