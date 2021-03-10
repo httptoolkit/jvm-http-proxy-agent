@@ -63,14 +63,3 @@ class KtorCioEngineTransformer(logger: TransformationLogger) : MatchingAgentTran
                 .on(hasMethodName("execute")))
     }
 }
-
-/**
- *
- *
- * Proxy settings live in HttpClientEngineConfig. Stored on CIOEngine at creation time,
- * then used in execute() only. Reset then?
- *
- * Yes: change getProxy settings (changes all new engines immediately, though others shouldn't
- * need it) and reset on execute()
- *
-*/

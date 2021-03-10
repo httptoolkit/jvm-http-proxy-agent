@@ -24,6 +24,7 @@ public class AkkaRequestClientCase extends ClientCase<Http> {
                 .singleRequest(HttpRequest.create(url))
                 .toCompletableFuture();
         HttpResponse response = responseFuture.get();
+        response.discardEntityBytes(system);
         return response.status().intValue();
     }
 }

@@ -105,6 +105,7 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         KtorCioEngineTransformer(logger),
         KtorClientTlsTransformer(logger),
         AkkaHttpTransformer(logger),
+        AkkaPoolSettingsTransformer(logger),
         AkkaPoolTransformer(logger)
     ).forEach { matchingAgentTransformer ->
         agentBuilder = matchingAgentTransformer.register(agentBuilder)
