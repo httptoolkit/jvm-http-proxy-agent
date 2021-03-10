@@ -20,7 +20,7 @@ public class OverrideHttpSettingsAdvice {
             // For 10.2+:
             ? ConnectionContext.httpsClient(HttpProxyAgent.getInterceptedSslContext())
             // For everything before then:
-            : akka.http.javadsl.ConnectionContext.https(HttpProxyAgent.getInterceptedSslContext());
+            : ConnectionContext.https(HttpProxyAgent.getInterceptedSslContext());
 
     @Advice.OnMethodEnter
     public static void beforeOutgoingConnection(
@@ -30,12 +30,14 @@ public class OverrideHttpSettingsAdvice {
         // Change all new outgoing connections to use the proxy:
         clientSettings = clientSettings.withTransport(
             ClientTransport.httpsProxy(new InetSocketAddress(
-                    HttpProxyAgent.getAgentProxyHost(),
-                    HttpProxyAgent.getAgentProxyPort()
+                HttpProxyAgent.getAgentProxyHost(),
+                HttpProxyAgent.getAgentProxyPort()
             ))
         );
 
         // Change all new outgoing connections to trust our certificate:
-        connectionContext = interceptedConnectionContext;
+        if (connectionContext.isSecure()) {
+            connectionContext = OverrideHttpSettingsAdvice.interceptedConnectionContext;
+        }
     }
 }

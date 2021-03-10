@@ -29,6 +29,8 @@ public class ResetPoolSetupAdvice {
         settings = settings.withTransport(interceptedProxyTransport);
 
         // Change all new outgoing connections to trust our certificate:
-        connContext = OverrideHttpSettingsAdvice.interceptedConnectionContext;
+        if (connContext.isSecure()) {
+            connContext = OverrideHttpSettingsAdvice.interceptedConnectionContext;
+        }
     }
 }

@@ -3,10 +3,12 @@ package tech.httptoolkit.testapp.cases;
 import akka.NotUsed;
 import akka.actor.ActorSystem;
 import akka.actor.ExtendedActorSystem;
+import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.HostConnectionPool;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
+import akka.http.javadsl.model.Uri;
 import akka.japi.Pair;
 import akka.stream.javadsl.Flow;
 import akka.stream.javadsl.Sink;
@@ -28,9 +30,9 @@ public class AkkaHostClientCase extends ClientCase<
 
     @Override
     public Flow<Pair<HttpRequest, NotUsed>, Pair<Try<HttpResponse>, NotUsed>, HostConnectionPool> newClient(String url) throws Exception {
-        URI uri = new URI(url);
+        Uri uri = Uri.create(url);
         return new Http((ExtendedActorSystem) system)
-            .cachedHostConnectionPool(uri.getHost());
+            .cachedHostConnectionPoolHttps(ConnectHttp.toHost(uri)); // HTTPS required here, or HTTP is *always* used
     }
 
     @Override
