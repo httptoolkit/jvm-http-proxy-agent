@@ -59,3 +59,20 @@ class AkkaPoolTransformer(logger: TransformationLogger) : MatchingAgentTransform
             )
     }
 }
+
+// The above works perfectly for new Akka, but as a last step we duplicate the 3rd step for slightly older versions:
+class AkkaGatewayTransformer(logger: TransformationLogger) : MatchingAgentTransformer(logger) {
+    override fun register(builder: AgentBuilder): AgentBuilder {
+        return builder
+            .type(named("akka.http.impl.engine.client.PoolGateway")) // Exists on <10.2.0
+            .transform(this)
+    }
+
+    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+        return builder
+            .visit(
+                Advice.to(ResetOldGatewaysAdvice::class.java)
+                    .on(hasMethodName("apply"))
+            )
+    }
+}
