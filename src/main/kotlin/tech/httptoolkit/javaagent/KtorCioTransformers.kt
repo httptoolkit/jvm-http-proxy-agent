@@ -20,9 +20,9 @@ class KtorClientTlsTransformer(logger: TransformationLogger) : MatchingAgentTran
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(KtorResetTlsClientTrustAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ktor.KtorResetTlsClientTrustAdvice")
                 .on(hasMethodName<MethodDescription>("openTLSSession")
                     .and(takesArgument(3, named("io.ktor.network.tls.TLSConfig")))))
     }
@@ -38,9 +38,9 @@ class KtorClientEngineConfigTransformer(logger: TransformationLogger) : Matching
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(ReturnProxyAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnProxyAdvice")
                 .on(hasMethodName("getProxy")))
         }
 }
@@ -57,9 +57,9 @@ class KtorCioEngineTransformer(logger: TransformationLogger) : MatchingAgentTran
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(KtorResetProxyFieldAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ktor.KtorResetProxyFieldAdvice")
                 .on(hasMethodName("execute")))
     }
 }

@@ -19,9 +19,9 @@ class ApacheClientRoutingV4Transformer(logger: TransformationLogger) : MatchingA
         ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder.visit(
-            Advice.to(ApacheV4ReturnProxyRouteAdvice::class.java)
+            loadAdvice("tech.httptoolkit.javaagent.advice.apacheclient.ApacheV4ReturnProxyRouteAdvice")
                 .on(hasMethodName("determineRoute"))
         )
     }
@@ -36,9 +36,9 @@ class ApacheClientRoutingV5Transformer(logger: TransformationLogger) : MatchingA
         ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder.visit(
-            Advice.to(ApacheV5ReturnProxyRouteAdvice::class.java)
+            loadAdvice("tech.httptoolkit.javaagent.advice.apacheclient.ApacheV5ReturnProxyRouteAdvice")
                 .on(hasMethodName("determineRoute"))
         )
     }
@@ -59,11 +59,11 @@ class ApacheSslSocketFactoryTransformer(logger: TransformationLogger) : Matching
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             .visit(
-            Advice.to(ApacheSetSslSocketFactoryAdvice::class.java)
-                .on(hasMethodName("createLayeredSocket"))
+                loadAdvice("tech.httptoolkit.javaagent.advice.apacheclient.ApacheSetSslSocketFactoryAdvice")
+                    .on(hasMethodName("createLayeredSocket"))
         );
     }
 }
@@ -80,13 +80,13 @@ class ApacheHostConfigurationTransformer(logger: TransformationLogger) : Matchin
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             // Override the proxy field value for all new configurations, and for any attempts to call
             // setProxy/ProxyHost. We don't no-op these, because we want to call them ourselves later on
             // existing configs to reset them - we don't just want to ignore this.
             .visit(
-                Advice.to(ApacheOverrideProxyHostFieldAdvice::class.java)
+                loadAdvice("tech.httptoolkit.javaagent.advice.apacheclient.ApacheOverrideProxyHostFieldAdvice")
                     .on(isConstructor<MethodDescription>()
                         .or(hasMethodName("setProxy"))
                         .or(hasMethodName("setProxyHost"))
@@ -107,10 +107,10 @@ class ApacheHttpMethodDirectorTransformer(logger: TransformationLogger) : Matchi
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             .visit(
-                Advice.to(ApacheSetConfigProxyHostAdvice::class.java)
+                loadAdvice("tech.httptoolkit.javaagent.advice.apacheclient.ApacheSetConfigProxyHostAdvice")
                     .on(hasMethodName("executeMethod"))
             )
     }
@@ -127,10 +127,10 @@ class ApacheProtocolTransformer(logger: TransformationLogger) : MatchingAgentTra
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             .visit(
-                Advice.to(ApacheReturnCustomSslProtocolSocketFactoryAdvice::class.java)
+                loadAdvice("tech.httptoolkit.javaagent.advice.apacheclient.ApacheReturnCustomSslProtocolSocketFactoryAdvice")
                     .on(hasMethodName("getSocketFactory"))
             )
     }

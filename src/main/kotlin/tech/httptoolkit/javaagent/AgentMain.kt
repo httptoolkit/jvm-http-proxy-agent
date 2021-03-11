@@ -4,16 +4,18 @@ package tech.httptoolkit.javaagent
 
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.builder.AgentBuilder
+import net.bytebuddy.asm.Advice
 import net.bytebuddy.description.type.TypeDescription
+import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.dynamic.scaffold.TypeValidation
 import net.bytebuddy.matcher.ElementMatchers.none
+import net.bytebuddy.pool.TypePool
 import net.bytebuddy.utility.JavaModule
 import java.lang.instrument.Instrumentation
 import javax.net.ssl.SSLContext
 import java.net.*
 import javax.net.ssl.HttpsURLConnection
-import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 
 
@@ -119,7 +121,7 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
 
 abstract class MatchingAgentTransformer(private val logger: TransformationLogger) : AgentBuilder.Transformer {
     abstract fun register(builder: AgentBuilder): AgentBuilder
-    abstract fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*>
+    abstract fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*>
 
     override fun transform(
         builder: DynamicType.Builder<*>,
@@ -128,7 +130,18 @@ abstract class MatchingAgentTransformer(private val logger: TransformationLogger
         module: JavaModule?
     ): DynamicType.Builder<*> {
         logger.beforeTransformation(typeDescription)
-        return transform(builder)
+
+        return transform(builder) { adviceName ->
+            val locator = if (classLoader != null) {
+                ClassFileLocator.Compound(
+                    ClassFileLocator.ForClassLoader.of(classLoader),
+                    ClassFileLocator.ForClassLoader.of(ByteBuddy::class.java.classLoader)
+                )
+            } else {
+                ClassFileLocator.ForClassLoader.of(ByteBuddy::class.java.classLoader)
+            }
+            Advice.to(TypePool.Default.of(locator).describe(adviceName).resolve(), locator)
+        }
     }
 }
 

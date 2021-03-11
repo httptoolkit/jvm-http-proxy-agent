@@ -22,18 +22,18 @@ class ProxySelectorTransformer(logger: TransformationLogger): MatchingAgentTrans
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             // We patch *all* proxy selectors, so that even code which doesn't use the default
             // still returns our proxy regardless.
-            .visit(Advice.to(OverrideAllProxySelectionAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.OverrideAllProxySelectionAdvice")
                 .on(
                     hasMethodName<MethodDescription>("select")
                     .and(takesArguments(1))
                     .and(takesArgument(0, named("java.net.URI")))))
             // We already set the default ProxySelector on startup, before we intercept anything.
             // Here we patch ProxySelector so nobody can overwrite that later.
-            .visit(Advice.to(SkipMethodAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.SkipMethodAdvice")
                 .on(hasMethodName("setDefault")));
     }
 }

@@ -18,9 +18,9 @@ class HttpsUrlConnectionTransformer(logger: TransformationLogger): MatchingAgent
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(ReturnSslSocketFactoryAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnSslSocketFactoryAdvice")
                 .on(hasMethodName("getSSLSocketFactory")))
     }
 }

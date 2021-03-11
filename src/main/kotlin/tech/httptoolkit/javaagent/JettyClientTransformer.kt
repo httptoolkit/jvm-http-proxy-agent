@@ -30,19 +30,19 @@ class JettyClientTransformer(logger: TransformationLogger): MatchingAgentTransfo
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(JettyReturnProxyConfigurationAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.jettyclient.JettyReturnProxyConfigurationAdvice")
                 .on(hasMethodName("getProxyConfiguration")))
-            .visit(Advice.to(JettyReturnSslContextFactoryV10Advice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.jettyclient.JettyReturnSslContextFactoryV10Advice")
                 .on(hasMethodName<MethodDescription>("getSslContextFactory").and(
                     returns(SslContextFactory.Client::class.java)
                 )))
-            .visit(Advice.to(JettyReturnSslContextFactoryV9Advice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.jettyclient.JettyReturnSslContextFactoryV9Advice")
                 .on(hasMethodName<MethodDescription>("getSslContextFactory").and(
                     returns(SslContextFactory::class.java)
                 )))
-            .visit(Advice.to(JettyResetDestinationsAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.jettyclient.JettyResetDestinationsAdvice")
                 .on(hasMethodName("resolveDestination")))
     }
 }

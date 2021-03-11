@@ -17,9 +17,9 @@ class UrlConnectionTransformer(logger: TransformationLogger): MatchingAgentTrans
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(OverrideUrlConnectionProxyAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.OverrideUrlConnectionProxyAdvice")
                 .on(
                     hasMethodName<MethodDescription>("openConnection")
                     .and(takesArguments(1))

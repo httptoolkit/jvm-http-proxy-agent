@@ -1,9 +1,12 @@
 package tech.httptoolkit.javaagent
 
+import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.builder.AgentBuilder
 import net.bytebuddy.asm.Advice
+import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.matcher.ElementMatchers.*
+import net.bytebuddy.pool.TypePool
 import tech.httptoolkit.javaagent.advice.akka.*
 
 // First, we hook outgoing connection creation, and ensure that new connections always go via the proxy & trust us:
@@ -14,10 +17,10 @@ class AkkaHttpTransformer(logger: TransformationLogger) : MatchingAgentTransform
             .transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             .visit(
-                Advice.to(OverrideHttpSettingsAdvice::class.java)
+                loadAdvice("tech.httptoolkit.javaagent.advice.akka.OverrideHttpSettingsAdvice")
                     .on(hasMethodName("_outgoingConnection"))
             )
     }
@@ -33,10 +36,10 @@ class AkkaPoolSettingsTransformer(logger: TransformationLogger) : MatchingAgentT
             .transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             .visit(
-                Advice.to(ResetPoolSetupAdvice::class.java)
+                loadAdvice("tech.httptoolkit.javaagent.advice.akka.ResetPoolSetupAdvice")
                     .on(isConstructor())
             )
     }
@@ -51,10 +54,10 @@ class AkkaPoolTransformer(logger: TransformationLogger) : MatchingAgentTransform
             .transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             .visit(
-                Advice.to(ResetOldPoolsAdvice::class.java)
+                loadAdvice("tech.httptoolkit.javaagent.advice.akka.ResetOldPoolsAdvice")
                     .on(hasMethodName("dispatchRequest"))
             )
     }
@@ -68,10 +71,10 @@ class AkkaGatewayTransformer(logger: TransformationLogger) : MatchingAgentTransf
             .transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             .visit(
-                Advice.to(ResetOldGatewaysAdvice::class.java)
+                loadAdvice("tech.httptoolkit.javaagent.advice.akka.ResetOldGatewaysAdvice")
                     .on(hasMethodName("apply"))
             )
     }

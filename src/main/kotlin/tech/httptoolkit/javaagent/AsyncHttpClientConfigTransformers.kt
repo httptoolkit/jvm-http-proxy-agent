@@ -20,12 +20,14 @@ class AsyncHttpClientConfigTransformer(logger: TransformationLogger) : MatchingA
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(AsyncHttpClientReturnSslContextAdvice::class.java)
-                .on(hasMethodName("getSslContext")))
-            .visit(Advice.to(AsyncHttpClientReturnProxySelectorAdvice::class.java)
-                .on(hasMethodName("getProxyServerSelector")))
+            .visit(
+                loadAdvice("tech.httptoolkit.javaagent.advice.asynchttpclient.AsyncHttpClientReturnSslContextAdvice")
+                    .on(hasMethodName("getSslContext")))
+            .visit(
+                loadAdvice("tech.httptoolkit.javaagent.advice.asynchttpclient.AsyncHttpClientReturnProxySelectorAdvice")
+                    .on(hasMethodName("getProxyServerSelector")))
     }
 }
 
@@ -39,9 +41,10 @@ class AsyncHttpChannelManagerTransformer(logger: TransformationLogger) : Matchin
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(AsyncHttpResetSslEngineFactoryAdvice::class.java)
-                .on(hasMethodName("createSslHandler")))
+            .visit(
+                loadAdvice("tech.httptoolkit.javaagent.advice.asynchttpclient.AsyncHttpResetSslEngineFactoryAdvice")
+                    .on(hasMethodName("createSslHandler")))
     }
 }

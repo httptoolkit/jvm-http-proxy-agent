@@ -16,11 +16,11 @@ class SslContextTransformer(logger: TransformationLogger): MatchingAgentTransfor
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             // We set the default SSLContext on startup, before we intercepted anything.
             // Here we patch SSLContext itself so nobody can overwrite that later.
-            .visit(Advice.to(SkipMethodAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.SkipMethodAdvice")
                 .on(hasMethodName("setDefault")));
     }
 }

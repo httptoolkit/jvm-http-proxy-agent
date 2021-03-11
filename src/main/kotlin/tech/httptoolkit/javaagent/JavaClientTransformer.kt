@@ -18,13 +18,13 @@ class JavaClientTransformer(logger: TransformationLogger): MatchingAgentTransfor
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(ReturnProxySelectorAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnProxySelectorAdvice")
                 .on(hasMethodName("proxy")))
-            .visit(Advice.to(ReturnSslContextAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnSslContextAdvice")
                 .on(hasMethodName("sslContext")))
-            .visit(Advice.to(ReturnSslContextAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnSslContextAdvice")
                 .on(hasMethodName("theSSLContext")))
     }
 }

@@ -37,9 +37,9 @@ class ReactorNettyClientConfigTransformer(logger: TransformationLogger): Matchin
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(ReactorNettyResetAllConfigAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.reactornetty.ReactorNettyResetAllConfigAdvice")
                 .on(matchConfigConstructor)
             )
     }
@@ -60,9 +60,9 @@ class ReactorNettyHttpClientSecureTransformer(logger: TransformationLogger): Mat
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(ReactorNettyResetHttpClientSecureSslAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.reactornetty.ReactorNettyResetHttpClientSecureSslAdvice")
                 .on(isConstructor()))
     }
 }
@@ -88,9 +88,9 @@ class ReactorNettyProxyProviderTransformer(logger: TransformationLogger): Matchi
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(ReactorNettyV09ResetProxyProviderFieldAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.reactornetty.ReactorNettyV09ResetProxyProviderFieldAdvice")
                 .on(isConstructor()))
     }
 }
@@ -115,9 +115,9 @@ class ReactorNettyOverrideRequestAddressTransformer(logger: TransformationLogger
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
-            .visit(Advice.to(ReturnProxyAddressAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnProxyAddressAdvice")
                 .on(hasMethodName("get")))
     }
 }

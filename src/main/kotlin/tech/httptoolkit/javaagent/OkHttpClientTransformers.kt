@@ -25,14 +25,14 @@ class OkHttpClientV3Transformer(logger: TransformationLogger): MatchingAgentTran
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             // v3 uses proxy() functions, while v4 uses Kotlin getters that compile to the same thing
-            .visit(Advice.to(ReturnProxyAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnProxyAdvice")
                 .on(hasMethodName("proxy")))
             // This means we ignore client certs, but that's fine: we can't pass them through the proxy anyway. That
             // needs to be configured separately in the proxy's configuration.
-            .visit(Advice.to(ReturnSslSocketFactoryAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnSslSocketFactoryAdvice")
                 .on(hasMethodName("sslSocketFactory")))
     }
 }
@@ -55,12 +55,12 @@ class OkHttpClientV2Transformer(logger: TransformationLogger): MatchingAgentTran
             ).transform(this)
     }
 
-    override fun transform(builder: DynamicType.Builder<*>): DynamicType.Builder<*> {
+    override fun transform(builder: DynamicType.Builder<*>, loadAdvice: (String) -> Advice): DynamicType.Builder<*> {
         return builder
             // v2 uses getX methods:
-            .visit(Advice.to(ReturnProxyAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnProxyAdvice")
                 .on(hasMethodName("getProxy")))
-            .visit(Advice.to(ReturnSslSocketFactoryAdvice::class.java)
+            .visit(loadAdvice("tech.httptoolkit.javaagent.advice.ReturnSslSocketFactoryAdvice")
                 .on(hasMethodName("getSslSocketFactory")))
     }
 }
