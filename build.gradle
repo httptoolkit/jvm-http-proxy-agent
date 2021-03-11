@@ -104,6 +104,7 @@ tasks.register('r8Jar', JavaExec) { task ->
     def rules = file('r8-rules.txt')
     task.dependsOn(tasks.shadowJar)
     task.outputs.file(r8File)
+    task.inputs.files shadowJar.getArchiveFile()
 
     task.classpath(configurations.r8)
     task.main = 'com.android.tools.r8.R8'
