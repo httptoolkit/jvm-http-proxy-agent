@@ -28,12 +28,20 @@ fun main(args: Array<String>) {
         // This isn't guaranteed to work everywhere, but it should work in most places:
         val (pid) = ManagementFactory.getRuntimeMXBean().name.split("@")
 
+        val vms = VirtualMachine.list()
+        if (vms.isEmpty()) {
+            // VMs should never be empty, because at the very least _we_ should be in there! If it's empty then
+            // scanning isn't working at all, and we should fail clearly.
+            System.err.println("Can't scan for attachable JVMs. Are we running in a JRE instead of a JDK?")
+            exitProcess(4)
+        }
 
-        VirtualMachine.list().forEach { vmd ->
+        vms.forEach { vmd ->
             if (vmd.id() != pid) {
                 println("${vmd.id()}:${vmd.displayName()}")
             }
         }
+
         exitProcess(0)
     } else if (args.size != 4) {
         System.err.println("Usage: java -jar <agent.jar> <target-PID> <proxyHost> <proxyPort> <path-to-certificate>")

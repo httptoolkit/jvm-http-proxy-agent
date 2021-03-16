@@ -7,6 +7,8 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.TestCase
 import io.kotest.core.test.TestResult
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldNotBeEmpty
+import java.io.BufferedReader
 import java.lang.Thread.sleep
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -40,6 +42,24 @@ val wireMockServer = WireMockServer(options()
 val runningProcs = arrayListOf<Process>()
 
 class IntegrationTests : StringSpec({
+    "Launching with list-targets should return successfully" {
+        val proc = ProcessBuilder(
+            javaPath,
+            "-jar", AGENT_JAR_PATH,
+            "list-targets"
+        ).start()
+        runningProcs.add(proc)
+        val outputReader = proc.inputStream.bufferedReader()
+
+        proc.waitFor(10, TimeUnit.SECONDS)
+
+        val output = outputReader.use(BufferedReader::readText)
+        output.shouldNotBeEmpty()
+
+        proc.isAlive.shouldBe(false)
+        proc.exitValue().shouldBe(0)
+    }
+
     "Launching with -javaagent should intercept all clients" {
 
         val agentArgs = "$proxyHost|${wireMockServer.port()}|$certPath"
