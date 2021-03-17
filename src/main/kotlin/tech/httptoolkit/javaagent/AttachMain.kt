@@ -59,7 +59,13 @@ fun main(args: Array<String>) {
 
 fun getOwnPid(): String {
     // This should work in general, but it's implementation dependent:
-    return ManagementFactory.getRuntimeMXBean().name.split("@")[0]
+    val pid = ManagementFactory.getRuntimeMXBean().name.split("@")[0]
+
+    return if (pid.toLongOrNull() != null) {
+        pid
+    } else {
+        ProcessHandle.current().pid().toString()
+    }
 }
 
 fun getTargets(): List<VirtualMachineDescriptor> {
