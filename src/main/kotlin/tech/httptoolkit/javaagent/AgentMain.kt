@@ -51,6 +51,14 @@ fun agentmain(arguments: String?, instrumentation: Instrumentation) {
     if (arguments.isNullOrEmpty()) {
         throw Error("Can't attach proxy agent without configuration arguments")
     }
+
+    // If attached as a test, we don't intercept anything, we're just checking that it's
+    // possible to attach in the first place with the current VM.
+    if (arguments == "attach-test") {
+        println("Agent attach test successful")
+        return
+    };
+
     val config = getConfigFromArg(arguments)
     interceptAllHttps(config, instrumentation)
 }

@@ -42,6 +42,21 @@ val wireMockServer = WireMockServer(options()
 val runningProcs = arrayListOf<Process>()
 
 class IntegrationTests : StringSpec({
+    "Launching a self test should return successfully" {
+        val proc = ProcessBuilder(
+            javaPath,
+            "-Djdk.attach.allowAttachSelf=true",
+            "-jar", AGENT_JAR_PATH,
+            "self-test"
+        ).start()
+        runningProcs.add(proc)
+
+        proc.waitFor(10, TimeUnit.SECONDS)
+
+        proc.isAlive.shouldBe(false)
+        proc.exitValue().shouldBe(0)
+    }
+
     "Launching with list-targets should return successfully" {
         val proc = ProcessBuilder(
             javaPath,
