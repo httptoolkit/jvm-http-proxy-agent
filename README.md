@@ -35,11 +35,15 @@ This agent can either be attached when the process is started, or attached later
 
 In each case, the agent must be configured with the proxy host (e.g. 127.0.0.1), the proxy port (e.g. 8000) and the absolute path to the HTTPS certificate to be trusted.
 
+### Attaching at startup
+
 To attach at startup, pass this JAR using the `javaagent` option, e.g:
 
 ```
 java -javaagent:./agent.jar=127.0.0.1|8000|/path/to/cert.pem -jar ./application.jar
 ```
+
+### Attaching to a running process
 
 To attach to a process, first launch the target process, and then run:
 
@@ -60,3 +64,13 @@ You can also query the available JVM processes ids, like so:
 ```
 
 When attached from startup all clients will always be intercepted. When attached later, both newly created HTTP clients and already existing instances will be intercepted, but it's possible that in some cases already established connections may not be immediately captured. Typically though these will eventually close and be reconnected, and at that point the connection is always intercepted.
+
+### Testing attachment capabilities
+
+Not all JDKs provide the instrumentation & attachment APIs required to support this process, although all Oracle & OpenJDK v9+ versions should do so.
+
+To check this, you can test whether the `java` in your $PATH is capable of attaching to and intercepting a target process using the self-test command, like so:
+
+```bash
+java -Djdk.attach.allowAttachSelf=true -jar ./agent.jar self-test
+```
