@@ -85,7 +85,7 @@ fun attachAgent(
 ) {
     val jarPath = File(
         ConstantProxySelector::class.java // Any arbitrary class defined inside this JAR
-            .protectionDomain.codeSource.location.path
+            .protectionDomain.codeSource.location.toURI()
     ).absolutePath
 
     // Inject the agent into the target VM
