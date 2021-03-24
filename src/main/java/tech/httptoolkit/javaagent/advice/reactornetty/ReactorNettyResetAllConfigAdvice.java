@@ -55,12 +55,8 @@ public class ReactorNettyResetAllConfigAdvice {
     @Advice.OnMethodEnter
     public static void beforeConstructor(
         @Advice.Argument(value=0) HttpClientConfig baseHttpConfig
-    ) {
-        try {
-            configSslField.set(baseHttpConfig, agentSslProvider);
-            proxyProviderField.set(baseHttpConfig, agentProxyProvider);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    ) throws Exception {
+        configSslField.set(baseHttpConfig, agentSslProvider);
+        proxyProviderField.set(baseHttpConfig, agentProxyProvider);
     }
 }
