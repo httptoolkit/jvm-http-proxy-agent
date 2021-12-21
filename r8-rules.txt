@@ -2,5 +2,7 @@
 -allowaccessmodification
 -keepattributes SourceFile, LineNumberTable, *Annotation*
 
+-keep class tech.httptoolkit.relocated.net.bytebuddy.utility.Invoker { *; }
+
 -keep class tech.httptoolkit.javaagent.** { *; }
 -keep class tech.httptoolkit.relocated.net.bytebuddy.asm.** { *; }
