@@ -29,7 +29,7 @@ configurations {
 }
 
 dependencies {
-    implementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.10.20'
+    implementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.12.6'
 
     // Dependencies we load only as part of rewriting them, iff the target app includes them:
     compileOnly group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
