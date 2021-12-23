@@ -32,6 +32,9 @@ dependencies {
     implementation group: 'com.typesafe.akka', name: 'akka-actor_2.13', version: '2.6.13'
     implementation group: 'com.typesafe.akka', name: 'akka-http_2.13', version: '10.2.4'
     implementation group: 'com.typesafe.akka', name: 'akka-stream_2.13', version: '2.6.13'
+
+    implementation group: 'io.vertx', name: 'vertx-core', version: '4.2.2'
+    implementation group: 'io.vertx', name: 'vertx-web-client', version: '4.2.2'
 }
 
 test {

@@ -44,6 +44,7 @@ dependencies {
     compileOnly group: 'io.ktor', name: 'ktor-client-cio', version: '1.5.2'
     compileOnly group: 'com.typesafe.akka', name: 'akka-http-core_2.13', version: '10.2.4'
     compileOnly group: 'com.typesafe.akka', name: 'akka-actor_2.13', version: '2.6.13'
+    compileOnly group: 'io.vertx', name: 'vertx-core', version: '4.2.2'
 
     // Test deps:
     testImplementation group: 'io.kotest', name: 'kotest-runner-junit5-jvm', version: '4.4.0'

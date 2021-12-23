@@ -30,7 +30,9 @@ public class Main {
         entry("spring-web", new SpringWebClientCase()),
         entry("ktor-cio", new KtorCioCase()),
         entry("akka-req-http", new AkkaRequestClientCase()),
-        entry("akka-host-http", new AkkaHostClientCase())
+        entry("akka-host-http", new AkkaHostClientCase()),
+        entry("vertx-httpclient", new VertxHttpClientCase()),
+        entry("vertx-webclient", new VertxWebClientCase())
     );
 
     public static void main(String[] args) throws Exception {
