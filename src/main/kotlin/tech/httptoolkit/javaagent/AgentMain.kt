@@ -117,7 +117,9 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
         AkkaHttpTransformer(logger),
         AkkaPoolSettingsTransformer(logger),
         AkkaPoolTransformer(logger),
-        AkkaGatewayTransformer(logger)
+        AkkaGatewayTransformer(logger),
+        VertxHttpClientTransformer(logger),
+        VertxNetClientOptionsTransformer(logger),
     ).forEach { matchingAgentTransformer ->
         agentBuilder = matchingAgentTransformer.register(agentBuilder)
     }
