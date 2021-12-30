@@ -116,9 +116,15 @@ tasks.register('r8Jar', JavaExec) { task ->
             '--classfile',
             '--output', r8File.toString(),
             '--pg-conf', rules.toString()
-    ] + configurations.compileOnly.collect {path ->
-         ['--lib', path.toString()] // Include libs from every runtime-only dep, so R8 can resolve them
-    }.flatten()
+    ] + (configurations.compileOnly.filter { path ->
+        // Include libs for a few runtime-only deps, so R8 can resolve them during optimization:
+        path.getName().startsWith("jna-") ||
+        path.getName().startsWith("jetty-util-") ||
+        path.getName().startsWith("commons-httpclient-") ||
+        path.getName().startsWith("async-http-client-")
+    }.collect {path ->
+         ['--lib', path.toString()]
+    }.flatten())
 
     doFirst {
         def java8Home = System.getenv("JAVA_HOME_8_X64")
