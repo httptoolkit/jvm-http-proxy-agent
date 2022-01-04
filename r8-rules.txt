@@ -1,8 +1,9 @@
 -dontobfuscate
+-dontoptimize
 -allowaccessmodification
 -keepattributes SourceFile, LineNumberTable, *Annotation*
 
--keep class tech.httptoolkit.relocated.net.bytebuddy.utility.Invoker { *; }
+-keep class tech.httptoolkit.relocated.net.bytebuddy.agent.builder.** { *; }
 
 -keep class tech.httptoolkit.javaagent.** { *; }
 -keep class tech.httptoolkit.relocated.net.bytebuddy.asm.** { *; }

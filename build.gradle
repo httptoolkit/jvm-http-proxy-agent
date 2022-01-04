@@ -143,11 +143,13 @@ task distJar(type: Jar) {
     // Pull raw advice classes from the shadow JAR, unminified:
     from (zipTree(shadowJar.getArchiveFile())) {
         include "tech/httptoolkit/javaagent/advice/**/*"
+        include "tech/httptoolkit/relocated/net/bytebuddy/agent/builder/**/*"
     }
 
     // Pull other source & bundled dependencies in their minified form, from R8:
     from (zipTree(r8Jar.outputs.files[0])) {
         exclude "tech/httptoolkit/javaagent/advice/**/*"
+        exclude "tech/httptoolkit/relocated/net/bytebuddy/agent/builder/**/*"
     }
 }
 
