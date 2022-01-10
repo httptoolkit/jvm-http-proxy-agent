@@ -41,7 +41,7 @@ In each case, the agent must be configured with the proxy host (e.g. 127.0.0.1),
 To attach at startup, pass this JAR using the `javaagent` option, e.g:
 
 ```
-java -javaagent:./agent.jar=127.0.0.1|8000|/path/to/cert.pem -jar ./application.jar
+java -javaagent:./agent.jar="127.0.0.1|8000|/path/to/cert.pem" -jar ./application.jar
 ```
 
 ### Attaching to a running process
