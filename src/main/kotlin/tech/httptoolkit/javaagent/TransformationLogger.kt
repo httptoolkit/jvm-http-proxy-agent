@@ -10,7 +10,7 @@ class TransformationLogger(private val debugMode: Boolean) : AgentBuilder.Listen
     private val transformingTypes: ArrayList<String> = ArrayList()
 
     fun beforeTransformation(type: TypeDescription) {
-        transformingTypes.add(type.canonicalName)
+        transformingTypes.add(type.canonicalName ?: "Unknown")
     }
 
     override fun onError(
