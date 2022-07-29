@@ -75,3 +75,29 @@ To check this, you can test whether the `java` in your $PATH is capable of attac
 ```bash
 java -Djdk.attach.allowAttachSelf=true -jar ./agent.jar self-test
 ```
+
+### Contributing
+
+Contributions are very welcome! Reports of scenarios that aren't currently supported are helpful (please [create an issue](https://github.com/httptoolkit/jvm-http-proxy-agent/issues/new), including any errors, and preferably steps to reproduce the issue) but patches to fix issues are even better.
+
+Be aware that for all contributors to HTTP Toolkit components, including this, [HTTP Toolkit Pro is totally free](https://github.com/httptoolkit/httptoolkit/#contributing-directly) - just [get in touch](https://httptoolkit.tech/contact) after your contribution is accepted with the email you'd like to use to claim your Pro account.
+
+To contribute a patch:
+
+* Fork this repo
+* Clone your fork: `git clone git@github.com:$YOUR_GITHUB_USERNAME/jvm-http-proxy-agent.git`
+* Create a new branch: `git checkout -B my-contribution-branch`
+* Check the existing tests pass locally: `./gradlew quickTest`
+  * N.B. this requires Java 11+ - while some features are supported in older JVM versions, development requires a modern JVM
+* For library-specific issues:
+  * Add/edit a test case in [/test-app/src/main/java/tech/httptoolkit/testapp/cases](https://github.com/httptoolkit/jvm-http-proxy-agent/tree/main/test-app/src/main/java/tech/httptoolkit/testapp/cases) to reproduce your issue
+  * Add that case to [the list](https://github.com/httptoolkit/jvm-http-proxy-agent/blob/459b931a2eebd486261f296418aa028e4b2fb7e9/test-app/src/main/java/tech/httptoolkit/testapp/Main.java#L17-L36) if you created a new case.
+  * Check that `./gradlew quickTest` now fails.
+* For more general changes:
+  * Either add a test case (as above) or add a new standalone test in https://github.com/httptoolkit/jvm-http-proxy-agent/blob/main/src/test/kotlin/IntegrationTests.kt
+* Make your changes within the [advice classes](https://github.com/httptoolkit/jvm-http-proxy-agent/tree/main/src/main/java/tech/httptoolkit/javaagent/advice) and [injection setup code](https://github.com/httptoolkit/jvm-http-proxy-agent/tree/main/src/main/kotlin/tech/httptoolkit/javaagent) to fix your issue/add your feature.
+* Test that `./gradlew quickTest` now passes.
+* If you've changed any functionality, consider adding it to the docs here.
+* Commit your change, push it, and open a PR here for review.
+
+If you have any issues, or if you want to discuss a change before working on it (recommended for large/complex changes), please [open an issue](https://github.com/httptoolkit/jvm-http-proxy-agent/issues/new).
