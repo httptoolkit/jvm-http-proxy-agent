@@ -4,7 +4,6 @@ import net.bytebuddy.asm.Advice;
 
 import javax.net.ssl.SSLContext;
 import java.lang.reflect.Field;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class ApacheSetSslSocketFactoryAdvice {
@@ -17,7 +16,7 @@ public class ApacheSetSslSocketFactoryAdvice {
         for (String factoryFieldName : Arrays.asList("socketfactory", "socketFactory")) {
             try {
                 // Detect which field(s) are present on this class
-                Field field = thisFactory.getClass().getDeclaredField(factoryFieldName);
+                Field field = getDeclaredFieldInClassTree(thisFactory.getClass(), factoryFieldName);
 
                 // Allow ourselves to change the socket factory value
                 field.setAccessible(true);
@@ -32,4 +31,14 @@ public class ApacheSetSslSocketFactoryAdvice {
             throw new IllegalStateException("Apache HttpClient interception setup failed");
         }
     }
+
+    public static Field getDeclaredFieldInClassTree(Class<?> type, String fieldName) throws NoSuchFieldException {
+        for (Class<?> clazz = type; clazz != null; clazz = clazz.getSuperclass()) {
+            try {
+                return clazz.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException ignored) { }
+        }
+        throw new NoSuchFieldException();
+    }
+    
 }
