@@ -35,6 +35,8 @@ dependencies {
 
     implementation group: 'io.vertx', name: 'vertx-core', version: '4.2.2'
     implementation group: 'io.vertx', name: 'vertx-web-client', version: '4.2.2'
+
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-client', version: '4.7.4.Final'
 }
 
 test {
