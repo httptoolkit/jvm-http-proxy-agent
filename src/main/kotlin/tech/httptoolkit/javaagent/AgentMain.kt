@@ -15,6 +15,7 @@ import net.bytebuddy.utility.JavaModule
 import java.lang.instrument.Instrumentation
 import javax.net.ssl.SSLContext
 import java.net.*
+import java.security.ProtectionDomain
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.TrustManagerFactory
 
@@ -137,7 +138,8 @@ abstract class MatchingAgentTransformer(private val logger: TransformationLogger
         builder: DynamicType.Builder<*>,
         typeDescription: TypeDescription,
         classLoader: ClassLoader?,
-        module: JavaModule?
+        module: JavaModule?,
+        protectionDomain: ProtectionDomain?
     ): DynamicType.Builder<*> {
         logger.beforeTransformation(typeDescription)
 
