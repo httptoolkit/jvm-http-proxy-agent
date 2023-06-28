@@ -41,7 +41,7 @@ public class Main {
         String pid = runtimeName.split("@")[0];
         System.out.println("PID: " + pid); // Purely for convenient manual attachment to this process
 
-        String url = "https://httpbin.org/404/"; // Always returns a 404, quelle surprise
+        String url = "https://example.com/404/"; // Always returns a 404
         ExecutorService executor = Executors.newCachedThreadPool();
 
         while (true) {
