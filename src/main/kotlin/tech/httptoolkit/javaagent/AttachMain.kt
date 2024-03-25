@@ -52,7 +52,7 @@ fun main(args: Array<String>) {
         attachAgent(pid, formatConfigArg(proxyHost, proxyPort, certPath))
     } else {
         System.err.println("Usage: java -jar <agent.jar> <target-PID> <proxyHost> <proxyPort> <path-to-certificate>")
-        System.err.println("Or pass a single 'self-test' or 'list-target' arg to check capabilities or scan for pids")
+        System.err.println("Or pass a single 'self-test' or 'list-targets' arg to check capabilities or scan for pids")
         exitProcess(2)
     }
 }
