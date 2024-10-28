@@ -127,7 +127,7 @@ fun interceptAllHttps(config: Config, instrumentation: Instrumentation) {
 
     agentBuilder.installOn(instrumentation)
 
-    println("HTTP Toolkit interception active")
+    System.err.println("HTTP Toolkit interception active")
 }
 
 abstract class MatchingAgentTransformer(private val logger: TransformationLogger) : AgentBuilder.Transformer {
