@@ -26,7 +26,7 @@ jobs:
       - name: Build & test the full distributable
         run: ./gradlew distTest
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: distributables
           path: build/libs/*-dist.jar
