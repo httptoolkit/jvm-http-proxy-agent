@@ -1,10 +1,10 @@
 # jvm-http-proxy-agent
 
-> _Part of [HTTP Toolkit](https://httptoolkit.tech): powerful tools for building, testing & debugging HTTP(S)_
+> _Part of [HTTP Toolkit](https://httptoolkit.com): powerful tools for building, testing & debugging HTTP(S)_
 
 A JVM agent that automatically forces a proxy for HTTP(S) connections, and trusts a given additional HTTPS certificate authority, for all major JVM HTTP clients.
 
-This agent lets you intercept all HTTP(S) from any JVM application automatically, with no code changes, so you can inspect, debug & mock this traffic using an HTTPS proxy, such as [HTTP Toolkit](https://httptoolkit.tech) or any other HTTPS MitM proxy.
+This agent lets you intercept all HTTP(S) from any JVM application automatically, with no code changes, so you can inspect, debug & mock this traffic using an HTTPS proxy, such as [HTTP Toolkit](https://httptoolkit.com) or any other HTTPS MitM proxy.
 
 You can either launch the application with this agent from the start, or it can attach to and take over HTTP(S) from an already running JVM application.
 
@@ -80,7 +80,7 @@ java -Djdk.attach.allowAttachSelf=true -jar ./agent.jar self-test
 
 Contributions are very welcome! Reports of scenarios that aren't currently supported are helpful (please [create an issue](https://github.com/httptoolkit/jvm-http-proxy-agent/issues/new), including any errors, and preferably steps to reproduce the issue) but patches to fix issues are even better.
 
-Be aware that for all contributors to HTTP Toolkit components, including this, [HTTP Toolkit Pro is totally free](https://github.com/httptoolkit/httptoolkit/#contributing-directly) - just [get in touch](https://httptoolkit.tech/contact) after your contribution is accepted with the email you'd like to use to claim your Pro account.
+Be aware that for all contributors to HTTP Toolkit components, including this, [HTTP Toolkit Pro is totally free](https://github.com/httptoolkit/httptoolkit/#contributing-directly) - just [get in touch](https://httptoolkit.com/contact) after your contribution is accepted with the email you'd like to use to claim your Pro account.
 
 To contribute a patch:
 
