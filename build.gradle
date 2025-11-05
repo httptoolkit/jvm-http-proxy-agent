@@ -29,7 +29,7 @@ configurations {
 }
 
 dependencies {
-    implementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.15.4'
+    implementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.17.8'
     // byte buddy contains references to jna classes and without them the r8Jar step fails
     compileOnly group: 'net.java.dev.jna', name: 'jna', version: '5.8.0'
 
