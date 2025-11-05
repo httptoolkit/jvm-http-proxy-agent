@@ -10,8 +10,8 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'org.jetbrains.kotlin.jvm' version '2.2.21'
+    id 'com.gradleup.shadow' version '9.2.2'
 }
 
 group 'tech.httptoolkit'
@@ -90,19 +90,15 @@ shadowJar {
     // We have to specifically exclude our reactor stub code here, because we don't want to the type
     // stubs that we've manually defined in our own source included here.
     exclude 'reactor/'
-}
 
-// As part of bundling the JAR, we relocate all dependencies into our namespace:
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-task relocateShadowJar(type: ConfigureShadowRelocation) {
-    target = tasks.shadowJar
-    prefix = "tech.httptoolkit.relocated"
+    // As part of bundling the JAR, we relocate all dependencies into our namespace:
+    enableAutoRelocation = true
+    relocationPrefix = "tech.httptoolkit.relocated"
 }
-tasks.shadowJar.dependsOn tasks.relocateShadowJar
 
 // Then we take this bundled JAR and optimize it. This shrinks it dramatically, but also breaks it, because
 // bytebuddy depends on some of our source being unmodified by R8 (frames in advice classes get messed with).
-def r8File = new File("$buildDir/libs/$archivesBaseName-r8.jar")
+def r8File = new File("${layout.buildDirectory.get().asFile}/libs/${project.name}-r8.jar")
 tasks.register('r8Jar', JavaExec) { task ->
     def rules = file('r8-rules.txt')
     task.dependsOn(tasks.shadowJar)
@@ -110,7 +106,7 @@ tasks.register('r8Jar', JavaExec) { task ->
     task.inputs.files shadowJar.getArchiveFile()
 
     task.classpath(configurations.r8)
-    task.main = 'com.android.tools.r8.R8'
+    task.mainClass = 'com.android.tools.r8.R8'
     task.args = [
             '--release',
             '--classfile',

@@ -14,10 +14,10 @@ jobs:
           java-version: 8
           distribution: adopt-hotspot
 
-      - name: Set up JDK 14 for build
+      - name: Set up JDK 24 for build
         uses: actions/setup-java@v3
         with:
-          java-version: 14
+          java-version: 24
           distribution: adopt-hotspot
 
       - name: Build & test the agent standalone
